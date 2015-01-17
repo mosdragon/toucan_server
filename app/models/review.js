@@ -21,7 +21,7 @@ var reviewSchema = new mongoose.Schema({
 
 reviewSchema.plugin(autoIncrement.plugin, {
 	model: reviewCollection,
-	startAt: 100,
+	startAt: 104,
 	incrementBy: 10,
 });
 

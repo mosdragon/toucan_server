@@ -58,7 +58,7 @@ sessionSchema.methods.makePayment = function() {
 
 sessionSchema.plugin(autoIncrement.plugin, {
 	model: sessionCollection,
-	startAt: 100,
+	startAt: 103,
 	incrementBy: 10,
 });
 

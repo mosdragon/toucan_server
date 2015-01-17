@@ -1,13 +1,15 @@
 var mongoose = require("../../db");
 var reviewSchema = require("./review").schema;
 
+var rateCollection = "Rates";
+var userCollection = "Users";
+
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
 
 var bcrypt = require('bcrypt'),
 var SALT_WORK_FACTOR = 12;
 
-var rateCollection = "Rate";
 var rateSchema = new mongoose.Schema({
 	course: String,
 	rate: Number,
@@ -36,7 +38,7 @@ rateSchema.plugin(autoIncrement.plugin, {
 });
 
 
-var userCollection = "Users";
+
 var userSchema = new mongoose.Schema({
 
 	_creditCards: {type: [Number], ref: "CreditCards", default: []},
