@@ -34,7 +34,7 @@ app.use('/', routes);
 app.use('/users', users);
 
 // mine
-var customUser = require("./app/controllers/userRoutes");
+var customUser = require("./app/controllers/users");
 app.use('/register', customUser);
 
 /// catch 404 and forward to error handler

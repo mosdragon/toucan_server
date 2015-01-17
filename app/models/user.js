@@ -1,8 +1,14 @@
 var mongoose = require("../../db");
-var collectionName = "Users";
 var reviewSchema = require("./review").schema;
 
-var rateSchema = mongoose.Schema({
+var autoIncrement = require('mongoose-auto-increment');
+autoIncrement.initialize(mongoose);
+
+var bcrypt = require('bcrypt'),
+var SALT_WORK_FACTOR = 12;
+
+var rateCollection = "Rate";
+var rateSchema = new mongoose.Schema({
 	course: String,
 	rate: Number,
 });
@@ -23,11 +29,18 @@ rateSchema.methods.setRate = function(update) {
 	this.rate = update;
 };
 
+rateSchema.plugin(autoIncrement.plugin, {
+	model: rateCollection,
+	startAt: 100,
+	incrementBy: 10,
+});
 
 
-var userSchema = mongoose.Schema({
+var userCollection = "Users";
+var userSchema = new mongoose.Schema({
 
-	// _id: Number, // fix with auto-increment
+	_creditCards: {type: [Number], ref: "CreditCards", default: []},
+	_sessions: {type: [Number], ref: "Sessions", default: []},
 	firstName: String,
 	lastName: String,
 	username: String,
@@ -42,10 +55,15 @@ var userSchema = mongoose.Schema({
 	userType: {type: String, enum: ["STUDENT", "TUTOR", "BOTH"], required: true},
 
 	// Only applies to tutors
-	coursesTaught: {type: [String], required: false, default: null},
-	rates: {type: [rateSchema], required: false, default: null},
-	reviews: {type: [reviewSchema], default: []},
-	// sessions: {type: [sessionSchema]}
+	_reviews: {type: [Number], ref: "Reviews", default: []},
+	coursesTaught: {type: [String], required: false, default: []},
+	hourlyRates: {type: [Number], ref: "Rate", required: false, default: []},
+});
+
+userSchema.plugin(autoIncrement.plugin, {
+	model: userCollection,
+	startAt: 100,
+	incrementBy: 10,
 });
 
 // Getters
@@ -65,9 +83,9 @@ userSchema.methods.getIdentifier = function() {return this.identifier};
 
 userSchema.methods.getUserType = function() {return this.userType};
 userSchema.methods.getCoursesTaught = function() {return this.coursesTaught};
-userSchema.methods.getRates = function() {return this.rates};
+userSchema.methods.getHourlyRates = function() {return this.hourlyRates};
 userSchema.methods.getReviews = function() {return this.reviews};
-
+userSchema.methods.getCreditCards = function() {return this._creditCards};
 
 // Setters	
 
@@ -83,17 +101,57 @@ userSchema.methods.setIdentifier = function(update) {this.identifier = update};
 
 userSchema.methods.setUserType = function(update) {this.userType = update};
 userSchema.methods.setCoursesTaught = function(update) {this.coursesTaught = update};
-userSchema.methods.setRates = function(update) {this.rates = update};
+userSchema.methods.setHourlyRates = function(update) {this.hourlyRates = update};
 userSchema.methods.setReviews = function(update) {this.reviews = update};
+userSchema.methods.setCreditCards = function(addition) {this._creditCards = addition};
+userSchema.methods.setSession = function(addition) {this._sessions = addition};
 
 // Array fields can have single pieces of data pushed to them
+
+userSchema.methods.addCreditCards = function(addition) {this._creditCards.push(addition)};
+userSchema.methods.addSession = function(addition) {this._sessions.push(addition)};
 userSchema.methods.addCourseTaught = function(addition) {this.coursesTaught.push(addition)};
-userSchema.methods.addRate = function(addition) {this.rates.push(addition)};
+userSchema.methods.addHourlyRate = function(addition) {this.hourlyRates.push(addition)};
 userSchema.methods.addReview = function(addition) {this.reviews.push(addition)};
 
+// Hash Password
+userSchema.pre('save', function(next) {
+    var user = this;
 
-module.exports = mongoose.model(collectionName, userSchema);
+    // only hash the password if it has been modified (or is new)
+    if (!user.isModified('password')) {
+    	return next();
+    }
+
+    // Generate a salt
+    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+        if (err) {
+        	return next(err);
+        } else {
+        	// hash the password along with our new salt
+        bcrypt.hash(user.password, salt, function(err, hash) {
+            if (err) {
+            	return next(err);
+
+            } else {
+            	// override the cleartext password with the hashed one
+	            user.password = hash;
+	            next();
+            }
+        });
+        }
+    });
+});
 
 
+userSchema.methods.comparePassword = function(candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+        if (err) {
+        	console.log(err);
+        }
+        cb(err, isMatch);
+    });
+};
 
 
+module.exports = mongoose.model(userCollection, userSchema);

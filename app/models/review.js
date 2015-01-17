@@ -1,20 +1,28 @@
 var mongoose = require("../../db");
-var collectionName = "Reviews";
+var reviewCollection = "Reviews";
 
-var reviewSchema = mongoose.Schema({
-	_id: {type: Number},
-	_tutor: {type: Number},
-	_student: {type: Number},
+var autoIncrement = require('mongoose-auto-increment');
+autoIncrement.initialize(mongoose);
+
+var reviewSchema = new mongoose.Schema({
+	_tutor: {type: Number, ref: "User"},
+	_student: {type: Number, ref: "User"},
 	tutorName: {type: String, required: true},
 	tutorId: {type: Number, ref: "User"},
 	rating: {type: Number, required: true},
 	title: String,
 	description: String,
-	dateWritten: Date,
-	deleted: Boolean,
+	course: String,
+	hourlyRate: Number,
+	dateWritten: {type: Date, default: new Date()},
+	deleted: {type: Boolean, default: false},
 
 });
 
+reviewSchema.plugin(autoIncrement.plugin, {
+	model: reviewCollection,
+	startAt: 100,
+	incrementBy: 10,
+});
 
-
-module.exports = mongoose.model(collectionName, reviewSchema);
+module.exports = mongoose.model(reviewCollection, reviewSchema);
