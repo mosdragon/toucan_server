@@ -1,4 +1,8 @@
 var express = require('express');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+
+
 var path = require('path');
 var favicon = require('static-favicon');
 var logger = require('morgan');
@@ -17,17 +21,20 @@ app.set('view engine', 'jade');
 
 app.use(favicon());
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+
+app.use(bodyParser.json({ type: 'application/*+json' }))
+app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.text({type: "json"}));
+
+app.use(methodOverride());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static (path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
 
 // mine
 var customUser = require("./app/controllers/userRoutes");
-console.log(customUser);
 app.use('/register', customUser);
 
 /// catch 404 and forward to error handler
