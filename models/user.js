@@ -1,7 +1,7 @@
 var db = require("db");
 var mongoose = require("mongoose");
-
-var userCollection = "User"
+var collectionName = "Users";
+var reviewSchema = require("review").schema;
 
 var rateSchema = mongoose.Schema({
 	course: String,
@@ -28,6 +28,7 @@ rateSchema.methods.setRate = function(update) {
 
 var userSchema = mongoose.Schema({
 
+	// _id: Number, // fix with auto-increment
 	firstName: String,
 	lastName: String,
 	username: String,
@@ -39,12 +40,13 @@ var userSchema = mongoose.Schema({
 	identifier: {required: true, type: Number},
 
 	// For now, usertype TUTOR is created in case we want tutors that absolutely cannot be students
-	userType: {enum: {"STUDENT", "TUTOR", "BOTH"}, required: true},
+	userType: {type: String, enum: ["STUDENT", "TUTOR", "BOTH"], required: true},
 
 	// Only applies to tutors
 	coursesTaught: {type: [String], required: false, default: null},
 	rates: {type: [rateSchema], required: false, default: null},
-	reviews: {type: }
+	reviews: {type: [reviewSchema], default: []},
+	// sessions: {type: [sessionSchema]}
 });
 
 // Getters
@@ -65,6 +67,7 @@ userSchema.methods.getIdentifier = function() {return this.identifier};
 userSchema.methods.getUserType = function() {return this.userType};
 userSchema.methods.getCoursesTaught = function() {return this.coursesTaught};
 userSchema.methods.getRates = function() {return this.rates};
+userSchema.methods.getReviews = function() {return this.reviews};
 
 
 // Setters	
@@ -82,13 +85,15 @@ userSchema.methods.setIdentifier = function(update) {this.identifier = update};
 userSchema.methods.setUserType = function(update) {this.userType = update};
 userSchema.methods.setCoursesTaught = function(update) {this.coursesTaught = update};
 userSchema.methods.setRates = function(update) {this.rates = update};
+userSchema.methods.setReviews = function(update) {this.reviews = update};
 
-// Array fields can use append to add invidual pieces of data
+// Array fields can have single pieces of data pushed to them
 userSchema.methods.addCourseTaught = function(addition) {this.coursesTaught.push(addition)};
 userSchema.methods.addRate = function(addition) {this.rates.push(addition)};
+userSchema.methods.addReview = function(addition) {this.reviews.push(addition)};
 
 
-module.exports = mongoose.model(userCollection, userSchema);
+module.exports = mongoose.model(collectionName, userSchema);
 
 
 
