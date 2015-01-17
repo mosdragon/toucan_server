@@ -1,7 +1,6 @@
-var db = require("db");
-var mongoose = require("mongoose");
+var mongoose = require("../../db");
 var collectionName = "Users";
-var reviewSchema = require("review").schema;
+var reviewSchema = require("./review").schema;
 
 var rateSchema = mongoose.Schema({
 	course: String,
@@ -34,9 +33,9 @@ var userSchema = mongoose.Schema({
 	username: String,
 	emailAddress: String,
 	password: String,
-	deleted: {type: boolean, default: false}.
+	deleted: {type: Boolean, default: false}, 
 	dateCreated: Date,
-	dateDeleted: {required: false, default: null},
+	dateDeleted: {type: Date, required: false, default: null},
 	identifier: {required: true, type: Number},
 
 	// For now, usertype TUTOR is created in case we want tutors that absolutely cannot be students
