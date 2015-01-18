@@ -10,10 +10,20 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var users = require('./app/controllers/users');
 
 
 var app = express();
+
+// Socket.io here
+// var server = require('http').Server(app);
+// var io = require('socket.io')(server);
+// var http = require('http').Server(app);
+
+// var somePort = 3000;
+// http.listen(somePort, function(){
+//   console.log('listening on *:' + somePort);
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,8 +44,8 @@ app.use('/', routes);
 app.use('/users', users);
 
 // mine
-var customUser = require("./app/controllers/users");
-app.use('/register', customUser);
+// var customUser = require("./app/controllers/users");
+// app.use('/register', customUser);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

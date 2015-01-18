@@ -6,7 +6,7 @@ var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
 
 var chargesSchema = new mongoose.Schema({
-	currency: {type: String, default:"usd"},
+	currency: {type: String, default: "usd"},
 	amount: Number,
 	description: String,
 	dateCreated: {type: Date, default: new Date()},
@@ -17,6 +17,7 @@ chargesSchema.plugin(autoIncrement.plugin, {
 	startAt: 101,
 	incrementBy: 10,
 });
+
 
 
 var creditCardSchema = new mongoose.Schema({

@@ -7,7 +7,7 @@ var userCollection = "Users";
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
 
-var bcrypt = require('bcrypt'),
+var bcrypt = require('bcrypt')
 var SALT_WORK_FACTOR = 12;
 
 var rateSchema = new mongoose.Schema({
@@ -45,13 +45,12 @@ var userSchema = new mongoose.Schema({
 	_sessions: {type: [Number], ref: "Sessions", default: []},
 	firstName: String,
 	lastName: String,
-	username: String,
-	emailAddress: String,
+	username: {type: String, unique:  true},
+	emailAddress: {type: String, unique: true},
 	password: String,
 	deleted: {type: Boolean, default: false}, 
 	dateCreated: Date,
 	dateDeleted: {type: Date, required: false, default: null},
-	identifier: {required: true, type: Number},
 
 	// For now, usertype TUTOR is created in case we want tutors that absolutely cannot be students
 	userType: {type: String, enum: ["STUDENT", "TUTOR", "BOTH"], required: true},
@@ -64,8 +63,16 @@ var userSchema = new mongoose.Schema({
 
 userSchema.plugin(autoIncrement.plugin, {
 	model: userCollection,
-	startAt: 100,
-	incrementBy: 10,
+	startAt: 90074993,
+	incrementBy: 13 * 13,
+});
+
+userSchema.plugin(autoIncrement.plugin, {
+	model: userCollection,
+	startAt: 60079949,
+	// Multiplying two prime numbers together to make it harder to guess
+	incrementBy: 7 * 21,
+	field: 'identifier',
 });
 
 // Getters
@@ -121,28 +128,29 @@ userSchema.pre('save', function(next) {
     var user = this;
 
     // only hash the password if it has been modified (or is new)
-    if (!user.isModified('password')) {
-    	return next();
-    }
+    if (user.isModified('password')) {
 
-    // Generate a salt
-    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-        if (err) {
-        	return next(err);
-        } else {
-        	// hash the password along with our new salt
-        bcrypt.hash(user.password, salt, function(err, hash) {
-            if (err) {
-            	return next(err);
+	    // Generate a salt
+	    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+	        if (err) {
+	        	return next(err);
+	        } else {
+	        	// hash the password along with our new salt
+	        bcrypt.hash(user.password, salt, function(err, hash) {
+	            if (err) {
+	            	return next(err);
 
-            } else {
-            	// override the cleartext password with the hashed one
-	            user.password = hash;
-	            next();
-            }
-        });
-        }
-    });
+	            } else {
+	            	// override the cleartext password with the hashed one
+		            user.password = hash;
+		            next();
+	            }
+	        });
+	        }
+	    });
+	} else {
+		return next();
+	}
 });
 
 
