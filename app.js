@@ -14,20 +14,14 @@ var users = require('./app/controllers/users');
 
 
 var app = express();
-
+var http = require('http').Server(app);
 // Socket.io here
-// var server = require('http').Server(app);
-// var io = require('socket.io')(server);
-// var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
-// var somePort = 3000;
-// http.listen(somePort, function(){
-//   console.log('listening on *:' + somePort);
-// });
 
-// view engine setup
+// View Engine Setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('view engine', 'jade');
 
 app.use(favicon());
 app.use(logger('dev'));
@@ -40,12 +34,11 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static (path.join(__dirname, 'public')));
 
-app.use('/', routes);
+// app.use('/', routes);
+app.get('/', function(req, res){
+  res.render('chat', {});
+});
 app.use('/users', users);
-
-// mine
-// var customUser = require("./app/controllers/users");
-// app.use('/register', customUser);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -76,6 +69,16 @@ app.use(function(err, req, res, next) {
         message: err.message,
         error: {}
     });
+});
+
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
+
+var somePort = 3000;
+http.listen(somePort, function(){
+  console.log('listening on *:' + somePort);
 });
 
 
