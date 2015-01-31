@@ -14,15 +14,15 @@ var chargesSchema = new mongoose.Schema({
 
 chargesSchema.plugin(autoIncrement.plugin, {
 	model: chargesCollection,
-	startAt: 101,
-	incrementBy: 10,
+	startAt: 674339,
+	incrementBy: (207 * 83 * 97),
 });
 
 
 
 var creditCardSchema = new mongoose.Schema({
 	_user: {type: Number, ref: "Users"},
-	_charges: {type: Number, ref: "Charges"},
+	_charges: {type: [Number], ref: "Charges"},
 	userEmail: String,
     number: String,
     exp_month: Number,
@@ -32,15 +32,12 @@ var creditCardSchema = new mongoose.Schema({
 
 creditCardSchema.plugin(autoIncrement.plugin, {
 	model: creditCardCollection,
-	startAt: 102,
-	incrementBy: 10,
+	startAt: 77092,
+	incrementBy: (13 * 403 * 17),
 });
 
 module.exports = mongoose.model(creditCardCollection, creditCardSchema);
 
-// var stripe = require("stripe")(
-//   "sk_test_BQokikJOvBiI2HlWgH4olfQ2"
-// );
 
 // stripe.charges.create({
 //   amount: 400,

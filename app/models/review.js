@@ -15,14 +15,12 @@ var reviewSchema = new mongoose.Schema({
 	course: String,
 	hourlyRate: Number,
 	dateWritten: {type: Date, default: new Date()},
-	deleted: {type: Boolean, default: false},
-
 });
 
 reviewSchema.plugin(autoIncrement.plugin, {
 	model: reviewCollection,
-	startAt: 104,
-	incrementBy: 10,
+	startAt: 997994,
+	incrementBy: (103 * 17 * 23),
 });
 
 module.exports = mongoose.model(reviewCollection, reviewSchema);

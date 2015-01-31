@@ -58,8 +58,8 @@ sessionSchema.methods.makePayment = function() {
 
 sessionSchema.plugin(autoIncrement.plugin, {
 	model: sessionCollection,
-	startAt: 103,
-	incrementBy: 10,
+	startAt: 5563,
+	incrementBy: (63 * 107 * 11),
 });
 
 module.exports = mongoose.model(sessionCollection, sessionSchema);

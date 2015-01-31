@@ -33,8 +33,8 @@ rateSchema.methods.setRate = function(update) {
 
 rateSchema.plugin(autoIncrement.plugin, {
 	model: rateCollection,
-	startAt: 100,
-	incrementBy: 10,
+	startAt: 104940,
+	incrementBy: (11 * 97 * 17),
 });
 
 
@@ -59,6 +59,7 @@ var userSchema = new mongoose.Schema({
 	_reviews: {type: [Number], ref: "Reviews", default: []},
 	coursesTaught: {type: [String], required: false, default: []},
 	hourlyRates: {type: [Number], ref: "Rate", required: false, default: []},
+	bankAccount: {type: Number, ref: "BankAccounts"},
 });
 
 userSchema.plugin(autoIncrement.plugin, {
