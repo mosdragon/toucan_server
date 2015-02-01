@@ -3,12 +3,18 @@ var router = express.Router();
 
 var User = require("../models/user");
 
+var basepath = "/api/v1"
+
 // var resetCount = function(data) {
 // 	data.resetCount(function(err, count) {
 // 		console.log("count is");
 // 		console.log(count);
 // 	});
 // }
+
+var path = function(addition) {
+	return basepath + addition;
+}
 
 var checkIfExists = function(emailAddress) {
 	console.log("checkIfExists");
@@ -22,7 +28,7 @@ var checkIfExists = function(emailAddress) {
 	});
 };
 
-router.post('/register', function(req, res) {
+router.post(path('/registerUser'), function(req, res) {
 	console.log("Creating user");
 	console.log(req.body);
 	console.log(typeof(req.body));
@@ -46,11 +52,47 @@ router.post('/register', function(req, res) {
 	});
 });
 
-router.post('/login', function(req, res) {
+	// _user: {type: Number, ref: "Users"},
+	// _transfers: {type: [Number], ref: "Transfers", default: []},
+	// userEmail: String,
+	//    bank_account: Number,
+	//    legal_name: String,
+
+router.post(path("/addBankInfo"), function(req, res) {
+	var input = JSON.parse(req.body);
+	var identifier = req.cookies.userId;
+	// var bankInfo = input.bankInfo;
+	User.findOne({
+		'identifier': identifier
+	}).exec(function(err, result) {
+		if (err || !result) {
+			res.send({
+				msg: "ERRORORR"
+			});
+		} else {
+			result.addBankAccountInfo(input, function(err, result) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						error: err,
+					});
+				}
+				res.send({
+						msg: "Successfully Added Bank Account",
+					});
+			});
+		}
+	})
+});
+
+
+
+router.get('/login', function(req, res) {
 
 });
 
-router.post('/verifyCredentials', function(req, res) {
+router.post(path('/verifyCredentials'), function(req, res) {
 	var input = JSON.parse(req.body);
 	var username = input.username;
 	var emailAddress = input.emailAddress;
@@ -62,7 +104,7 @@ router.post('/verifyCredentials', function(req, res) {
 	}).exec(function(err, result) {
 		if (err) {
 			console.log(err);
-		} else {
+		} else if (result) {
 			console.log(result);
 			console.log(typeof(result));
 			console.log("time to check password");
@@ -73,9 +115,17 @@ router.post('/verifyCredentials', function(req, res) {
 					res.send("BAD PASSWORD");
 				} else {
 					console.log("password is bueno. Good job grasshopper");
-					res.send("VERIFIED");
+					res.cookie("userId", result.identifier);
+					res.send({
+						msg: "VERIFIED",
+						userId: result.identifier
+					});
 				}
 			});			
+		} else {
+			res.send({
+				msg: "FAILURE"
+			});
 		}
 	});
 });

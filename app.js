@@ -9,6 +9,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var config = require("./config");
+
 var routes = require('./routes/index');
 var users = require('./app/controllers/users');
 
@@ -21,7 +23,8 @@ var io = require('socket.io')(http);
 
 // View Engine Setup
 app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
+app.set('view engine', 'jade');
+// app.set('view engine', 'html');
 
 app.use(favicon());
 app.use(logger('dev'));
@@ -31,13 +34,14 @@ app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.text({type: "json"}));
 
 app.use(methodOverride());
-app.use(cookieParser());
+app.use(cookieParser(config.dev.cookiePassword));
 app.use(express.static (path.join(__dirname, 'public')));
 
 // app.use('/', routes);
 app.get('/', function(req, res){
   res.render('chat', {});
 });
+
 app.use('/users', users);
 
 /// catch 404 and forward to error handler
@@ -65,20 +69,23 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.send({
         message: err.message,
-        error: {}
+        error: "ERRORORORRORORO"
     });
 });
 
 
 io.on('connection', function(socket){
   console.log('a user connected');
+  socket.on('disconnect', function(){
+    console.log('user disconnected :(');
+  });
 });
 
-var somePort = 3000;
-http.listen(somePort, function(){
-  console.log('listening on *:' + somePort);
+var port = 3000;
+http.listen(port, function(){
+  console.log('listening on port ' + port);
 });
 
 
