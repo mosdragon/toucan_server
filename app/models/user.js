@@ -118,8 +118,40 @@ userSchema.methods.addBankAccountInfo = function(info, callback) {
 	    	return callback(err, addition);
 	    });
     });
-    // self._bankAccounts.push(addition);
-    
+    // self._bankAccounts.push(addition); 
+}
+
+userSchema.methods.addBankToken = function(info, callback) {
+	var self = this;
+
+	var user = self._id;
+	var userEmail = self.emailAddress;
+    var bank_token = info.bank_token;
+    var legal_name = info.legal_name;
+
+    var params = {
+    	'_user': user,
+    	'userEmail': userEmail,
+    	'stripe_token': bank_token,
+    	'legal_name': legal_name
+    };
+
+    var addition = new BankAccount(params);
+    addition.save(function(err) {
+    	if (err) {
+    		console.log(err);
+    		return callback(err);
+    	}
+    	self._bankAccounts.push(addition._id);
+    	self.save(function(err) {
+	    	if (err) {
+	    		return callback(err);
+	    		console.log(err);
+	    	}
+	    	return callback(err, addition);
+	    });
+    });
+    // self._bankAccounts.push(addition); 
 }
 
 // Hash Password

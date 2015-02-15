@@ -26,12 +26,25 @@ bankAccountSchema.methods.setStripeId = function() {
 }
 
 bankAccountSchema.methods.setBlurredNumber = function(input) {
-	this.blurred_number += input;
+	this.blurred_number += String(input);
 }
 
 bankAccountSchema.methods.addTransfer = function(transfer) {
 	this._transfers.push(transfer)
 };
+
+bankAccountSchema.pre('save', function(next) {
+    var self = this;
+
+    // only if stripe_token added/modified
+    if (self.isModified('stripe_token')) {
+
+	    self.setStripeId();
+
+	} else {
+		return next();
+	}
+});
 
 module.exports = mongoose.model(bankAccountCollection, bankAccountSchema);
 
