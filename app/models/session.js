@@ -9,7 +9,7 @@ var sessionSchema = new mongoose.Schema({
 	tutorPhone: Number,
 	_student: {type: Number, ref: "User", required: true},
 	studentPhone: Number,
-	appointmentCreated: {type: Date, default: },
+	appointmentCreated: {type: Date, default: new Date()},
 	appointmentBegin: Date,
 	appointmentEnd: Date,
 	hoursOfService: Number,
@@ -18,11 +18,11 @@ var sessionSchema = new mongoose.Schema({
 	_creditCard: {type: Number, ref: "CreditCard"},
 });
 
-sessionSchema.methdos.beginAppointment = function() {
+sessionSchema.methods.beginAppointment = function() {
 	this.appointmentBegin = new Date();
 };
 
-sessionSchema.methdos.endAppointment = function() {
+sessionSchema.methods.endAppointment = function() {
 	this.appointmentEnd = new Date();
 
 	// Gets hours up-to 2 decimal places

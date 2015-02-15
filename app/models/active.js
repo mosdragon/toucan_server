@@ -20,23 +20,22 @@ var activeSchema = new mongoose.Schema({
 
 	_tutor: {type: Number, ref: "Users", unique: true},
 	_session: {type: Number, ref: "Sessions"}, // session will be created once a tutor and tutee connect
-	dateCreated: {type: Date, default: new Date()},
-	beginTime: {type: Date, default: new Date()},
-	endTime: {type: Date, default: null},
-	available: {type: boolean, default: true},
+	beginTime: {type: Date},
+	endTime: {type: Date},
+	available: {type: Boolean, default: true},
 	coursesTaught: {type: [String], default: []},
 	// Using geospatial indexing -- format is [long, lat]
 	location: {type: [Number], index: "2d", required: true},
 });
 
-activeSchema.statics.milesToDegrees = function(miles) {
+activeSchema.statics.milesToRadians = function(miles) {
 	var km = Math.floor(miles * milesToKM * 100) / 100;
-	return kmToDegrees(km);
+	return kmToRadians(km);
 };
 
-activeSchema.statics.kmToDegrees = function(km) {
-	var degrees = km / earthRadius; // approximate
-	return degrees;
+activeSchema.statics.kmToRadians = function(km) {
+	var radians = km / earthRadius; // approximate
+	return radians;
 };
 
 activeSchema.methods.setSession = function(params, callback) {
@@ -55,22 +54,22 @@ activeSchema.plugin(autoIncrement.plugin, {
 activeSchema.pre('save', function(next) {
     var self = this;
 
-    
-    if (self.['endTime'] == null) {
-    	var now = new Date();
-    	// One hour from now
-    	now.setHours(now.getHours() + 1);
-	    self.setStripeId();
-	    // User.findOne({_id: self._tutor}, function(err, user) {
-	    // 	console.log(user);
-	    // 	self.coursesTaught = user.coursesTaught;
-	    // 	return next();
-	    // });
-		next();
+    next();
+ //    if (self['endTime'] == null) {
+ //    	var now = new Date();
+ //    	// One hour from now
+ //    	now.setHours(now.getHours() + 1);
+	//     self.setStripeId();
+	//     // User.findOne({_id: self._tutor}, function(err, user) {
+	//     // 	console.log(user);
+	//     // 	self.coursesTaught = user.coursesTaught;
+	//     // 	return next();
+	//     // });
+	// 	next();
 
-	} else {
-		return next();
-	}
+	// } else {
+	// 	return next();
+	// }
 });
 
 

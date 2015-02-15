@@ -55,7 +55,7 @@ var userSchema = new mongoose.Schema({
 	dateDeleted: {type: Date, required: false, default: null},
 
 	// Can be Tutor, Tutee, or both. We just want to have proper documentation added to enable both
-	userType: {type: String, enum: ["TUTOR", "TUTEE", "BOTH"], required: true, default: "STUDENT"},
+	userType: {type: String, enum: ["TUTOR", "TUTEE", "BOTH"], required: true, default: "TUTEE"},
 
 	// Only applies to tutors
 	_reviews: {type: [Number], ref: "Reviews", default: []},
