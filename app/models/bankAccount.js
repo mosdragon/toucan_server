@@ -7,9 +7,12 @@ autoIncrement.initialize(mongoose);
 var bankAccountSchema = new mongoose.Schema({
 	_user: {type: Number, ref: "Users"},
 	_transfers: {type: [Number], ref: "Transfers", default: []},
+	stipe_id: {type: String},
+	stripe_token: {type: Object},
+	nickname: {type: String},
 	userEmail: String,
-    bank_account: {type: Number, unique: true},
     legal_name: String,
+    blurred_number: {type: String, default: "XXXX-XXXX-XXXX-"},
 });
 
 bankAccountSchema.plugin(autoIncrement.plugin, {
@@ -17,6 +20,14 @@ bankAccountSchema.plugin(autoIncrement.plugin, {
 	startAt: 663157,
 	incrementBy: (93 * 91 * 17),
 });
+
+bankAccountSchema.methods.setStripeId = function() {
+	this.stripe_id = stripe_token.id;
+}
+
+bankAccountSchema.methods.setBlurredNumber = function(input) {
+	this.blurred_number += input;
+}
 
 bankAccountSchema.methods.addTransfer = function(transfer) {
 	this._transfers.push(transfer)

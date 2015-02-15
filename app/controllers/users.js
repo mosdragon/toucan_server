@@ -86,6 +86,34 @@ router.post(path("/addBankInfo"), function(req, res) {
 	})
 });
 
+router.post(path("/createBankInfoId"), function(req, res) {
+	var input = JSON.parse(req.body);
+	var identifier = req.cookies.userId;
+	// var bankInfo = input.bankInfo;
+	User.findOne({
+		'identifier': identifier
+	}).exec(function(err, result) {
+		if (err || !result) {
+			res.send({
+				msg: "ERRORORR"
+			});
+		} else {
+			result.addBankAccountInfo(input, function(err, result) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						error: err,
+					});
+				}
+				res.send({
+						msg: "Successfully Added Bank Account",
+					});
+			});
+		}
+	});
+});
+
 
 
 router.get('/login', function(req, res) {

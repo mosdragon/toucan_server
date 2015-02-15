@@ -7,8 +7,9 @@ autoIncrement.initialize(mongoose);
 var transfersSchema = new mongoose.Schema({
 	currency: {type: String, default: "usd"},
 	amount: Number, // amount in cents, by Stripe api
+	stripe_recipient: {type: Number, required: true},
 	dateCreated: {type: Date, default: new Date()},
-  	recipient: Number,
+  	_recipient: {type: Number, ref:"User", required: true},
   	bank_account: String,
   	statement_descriptor: String,
   	transfer_obj: Object,

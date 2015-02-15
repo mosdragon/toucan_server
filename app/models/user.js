@@ -54,13 +54,14 @@ var userSchema = new mongoose.Schema({
 	dateCreated: Date,
 	dateDeleted: {type: Date, required: false, default: null},
 
-	// For now, usertype TUTOR is created in case we want tutors that absolutely cannot be students
-	userType: {type: String, enum: ["STUDENT", "TUTOR", "BOTH"], required: true},
+	// Can be Tutor, Tutee, or both. We just want to have proper documentation added to enable both
+	userType: {type: String, enum: ["TUTOR", "TUTEE", "BOTH"], required: true, default: "STUDENT"},
 
 	// Only applies to tutors
 	_reviews: {type: [Number], ref: "Reviews", default: []},
 	coursesTaught: {type: [String], required: false, default: []},
 	hourlyRates: {type: [Number], ref: "Rate", required: false, default: []},
+	isCertified: {type: Boolean, default: false},
 });
 
 userSchema.plugin(autoIncrement.plugin, {
