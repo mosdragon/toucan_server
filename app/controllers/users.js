@@ -304,7 +304,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	// var identifier = input.userId;
 
 	var hourLater = new Date();
-	hourLater.setHours(hourLater.getHours() + 1);
+	hourLater.setHours(hourLater.getHours() + 4);
 
 	var endTime = hourLater;
 	var latitude = input.latitude;
@@ -320,21 +320,21 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	}
 
 	Active.find({  
-	    loc: {
+	    location: {
 	        $near: params.location,
 	        $maxDistance: maxDistRadians,
 	    },
 	    coursesTaught: {
 	    	$in: [course],
 	    },
-	    available: true,
-	    endTime: {
-	    	$lt: params.endTime,
-	    	$gte: (new Date()),
-	    }
+	    // available: true, // this is the problem!!
+	    // endTime: {  // this is the problem too!!
+	    // 	$lt: params.endTime,
+	    // 	$gte: (new Date()),
+	    // }
 	})
 	.populate("_tutor")
-	.limit(70).exec(function(err, actives) {
+	.exec(function(err, actives) {
 	    if (err) {
 	    	console.log(err);
 	        res.send({
