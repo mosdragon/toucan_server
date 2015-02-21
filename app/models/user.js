@@ -1,6 +1,7 @@
 var mongoose = require("../../db");
 var BankAccount = require("./bankAccount");
 var reviewSchema = require("./review").schema;
+var baseRate = require("../../config").baseRate;
 
 var rateCollection = "Rates";
 var userCollection = "Users";
@@ -11,32 +12,34 @@ autoIncrement.initialize(mongoose);
 var bcrypt = require('bcrypt')
 var SALT_WORK_FACTOR = 12;
 
-var rateSchema = new mongoose.Schema({
-	course: String,
-	rate: Number,
-});
+// var rateSchema = new mongoose.Schema({
+// 	course: String,
+// 	rate: Number,
+// });
 
-rateSchema.methods.getCourse = function() {
-	return this.course;
-};
+// rateSchema.methods.getCourse = function() {
+// 	return this.course;
+// };
 
-rateSchema.methods.getRate = function() {
-	return this.rate;
-};
+// rateSchema.methods.getRate = function() {
+// 	return this.rate;
+// };
 
-rateSchema.methods.setCourse = function(update) {
-	this.course = update;
-};
+// rateSchema.methods.setCourse = function(update) {
+// 	this.course = update;
+// };
 
-rateSchema.methods.setRate = function(update) {
-	this.rate = update;
-};
+// rateSchema.methods.setRate = function(update) {
+// 	this.rate = update;
+// };
 
-rateSchema.plugin(autoIncrement.plugin, {
-	model: rateCollection,
-	startAt: 104940,
-	incrementBy: (11 * 97 * 17),
-});
+// rateSchema.plugin(autoIncrement.plugin, {
+// 	model: rateCollection,
+// 	startAt: 104940,
+// 	incrementBy: (11 * 97 * 17),
+// });
+
+// var Rate = mongoose.model(rateCollection, rateSchema);
 
 
 
@@ -60,20 +63,20 @@ var userSchema = new mongoose.Schema({
 	// Only applies to tutors
 	_reviews: {type: [Number], ref: "Reviews", default: []},
 	coursesTaught: {type: [String], required: false, default: []},
-	hourlyRates: {type: [Number], ref: "Rate", required: false, default: []},
+	hourlyRates: {type: Object, required: false, default: {}},
 	isCertified: {type: Boolean, default: false},
-	biography: {type: String}, // 
+	biography: {type: String},
 });
 
 userSchema.plugin(autoIncrement.plugin, {
 	model: userCollection,
-	startAt: 90074993,
+	startAt: 903778,
 	incrementBy: 13 * 13,
 });
 
 userSchema.plugin(autoIncrement.plugin, {
 	model: userCollection,
-	startAt: 60079949,
+	startAt: 6007949,
 	// Multiplying two prime numbers together to make it harder to guess
 	incrementBy: 7 * 21,
 	field: 'identifier',
@@ -81,12 +84,34 @@ userSchema.plugin(autoIncrement.plugin, {
 
 // Array fields can have single pieces of data pushed to them
 
-userSchema.methods.addCreditCards = function(addition) {this._creditCards.push(addition)};
-userSchema.methods.addSession = function(addition) {this._sessions.push(addition)};
-userSchema.methods.addCourseTaught = function(addition) {this.coursesTaught.push(addition)};
-userSchema.methods.addHourlyRate = function(addition) {this.hourlyRates.push(addition)};
-userSchema.methods.addReview = function(addition) {this.reviews.push(addition)};
-// userSchema.methods.addBankInfo = function(addition) {this._bankAccounts.push(addition)};
+userSchema.methods.addCreditCards = function(creditCard) {this._creditCards.push(creditCard)};
+userSchema.methods.addSession = function(session) {this._sessions.push(session)};
+userSchema.methods.addReview = function(review) {this.reviews.push(review)};
+
+// userSchema.methods.addCourse = function(coursename) {
+// 	this.addCourse(coursename, baseRate);
+// };
+
+userSchema.methods.addCourse = function(coursename, rate) {
+	var setRate = rate? rate : baseRate;
+	
+	if (this.coursesTaught.indexOf(coursename) == -1) {
+	    // In the array!
+	    this.coursesTaught.push(coursename);
+	}
+	if (!this.hourlyRates) {
+		this.hourlyRates = {};
+	}
+	this.hourlyRates[coursename] = rate;
+};
+
+userSchema.methods.addManyCourses = function(courses, rates) {
+	
+	for (var i = 0; i < courses.length; i++) {
+		this.addCourse(courses[i], baseRate);
+	}
+};
+
 
 userSchema.methods.addBankAccountInfo = function(info, callback) {
 	var self = this;

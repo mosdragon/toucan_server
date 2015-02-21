@@ -22,7 +22,7 @@ var activeSchema = new mongoose.Schema({
 	_session: {type: Number, ref: "Sessions"}, // session will be created once a tutor and tutee connect
 	beginTime: {type: Date},
 	endTime: {type: Date},
-	available: {type: Boolean, default: true},
+	available: {type: Boolean, required: true, default: true},
 	coursesTaught: {type: [String], default: []},
 	// Using geospatial indexing -- format is [long, lat]
 	location: {type: [Number], index: "2d", required: true},
@@ -54,22 +54,22 @@ activeSchema.plugin(autoIncrement.plugin, {
 activeSchema.pre('save', function(next) {
     var self = this;
 
-    next();
- //    if (self['endTime'] == null) {
- //    	var now = new Date();
- //    	// One hour from now
- //    	now.setHours(now.getHours() + 1);
-	//     self.setStripeId();
-	//     // User.findOne({_id: self._tutor}, function(err, user) {
-	//     // 	console.log(user);
-	//     // 	self.coursesTaught = user.coursesTaught;
-	//     // 	return next();
-	//     // });
-	// 	next();
+    // next();
+    if (self['endTime'] == null) {
+    	var now = new Date();
+    	// One hour from now
+    	now.setHours(now.getHours() + 1);
+	    self.setStripeId();
+	    // User.findOne({_id: self._tutor}, function(err, user) {
+	    // 	console.log(user);
+	    // 	self.coursesTaught = user.coursesTaught;
+	    // 	return next();
+	    // });
+		next();
 
-	// } else {
-	// 	return next();
-	// }
+	} else {
+		return next();
+	}
 });
 
 

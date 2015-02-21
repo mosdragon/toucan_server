@@ -57,111 +57,45 @@ router.post(path('/registerUser'), function(req, res) {
 	});
 });
 
-	// _user: {type: Number, ref: "Users"},
-	// _transfers: {type: [Number], ref: "Transfers", default: []},
-	// userEmail: String,
-	//    bank_account: Number,
-	//    legal_name: String,
 
-// router.post(path("/addBankInfo"), function(req, res) {
+// router.post(path('/verifyCredentials'), function(req, res) {
 // 	var input = JSON.parse(req.body);
-// 	var identifier = req.cookies.userId;
-// 	// var bankInfo = input.bankInfo;
-// 	User.findOne({
-// 		'identifier': identifier
-// 	}).exec(function(err, result) {
-// 		if (err || !result) {
-// 			res.send({
-// 				msg: "ERRORORR",
-// 				code: failure,
-// 			});
-// 		} else {
-// 			result.addBankAccountInfo(input, function(err, result) {
-// 				if (err) {
-// 					console.log(err);
-// 					res.send({
-// 						msg: "FAILURE",
-// 						error: err,
-// 						code: failure,
-// 					});
-// 				}
-// 				res.send({
-// 					msg: "Successfully Added Bank Account",
-// 					code: success
-// 				});
-// 			});
-// 		}
-// 	})
-// });
+// 	var username = input.username;
+// 	var emailAddress = input.emailAddress;
+// 	var password = input.password;
 
-// router.post(path("/createBankInfo"), function(req, res) {
-// 	var input = JSON.parse(req.body);
-// 	var identifier = req.cookies.userId;
-// 	// var bankInfo = input.bankInfo;
-// 	User.findOne({
-// 		'identifier': identifier
+// 	Active.findOne({
+// 		// username: username,
+// 		"emailAddress": emailAddress,
 // 	}).exec(function(err, result) {
-// 		if (err || !result) {
-// 			res.send({
-// 				msg: "ERRORORR"
-// 			});
-// 		} else {
-// 			result.addBankAccountInfo(input, function(err, result) {
-// 				if (err) {
+// 		if (err) {
+// 			console.log(err);
+// 		} else if (result) {
+// 			console.log(result);
+// 			console.log(typeof(result));
+// 			console.log("time to check password");
+
+// 			result.comparePassword(password, function(err, isMatch) {
+// 				if (err || !isMatch) {
 // 					console.log(err);
+// 					res.send("BAD PASSWORD");
+// 				} else {
+// 					console.log("password is bueno. Good job grasshopper");
+// 					res.cookie("userId", result.identifier);
 // 					res.send({
-// 						msg: "FAILURE",
-// 						error: err,
-// 						code: failure,
-// 					});
-// 				}
-// 				res.send({
-// 						msg: "Successfully Added Bank Account",
+// 						msg: "VERIFIED",
 // 						code: success,
+// 						userId: result.identifier
 // 					});
+// 				}
+// 			});			
+// 		} else {
+// 			res.send({
+// 				msg: "FAILURE"
 // 			});
 // 		}
 // 	});
 // });
-
-router.post(path('/verifyCredentials'), function(req, res) {
-	var input = JSON.parse(req.body);
-	var username = input.username;
-	var emailAddress = input.emailAddress;
-	var password = input.password;
-
-	Active.findOne({
-		// username: username,
-		"emailAddress": emailAddress,
-	}).exec(function(err, result) {
-		if (err) {
-			console.log(err);
-		} else if (result) {
-			console.log(result);
-			console.log(typeof(result));
-			console.log("time to check password");
-
-			result.comparePassword(password, function(err, isMatch) {
-				if (err || !isMatch) {
-					console.log(err);
-					res.send("BAD PASSWORD");
-				} else {
-					console.log("password is bueno. Good job grasshopper");
-					res.cookie("userId", result.identifier);
-					res.send({
-						msg: "VERIFIED",
-						code: success,
-						userId: result.identifier
-					});
-				}
-			});			
-		} else {
-			res.send({
-				msg: "FAILURE"
-			});
-		}
-	});
-});
 
 // Client Apps only
 
@@ -192,6 +126,90 @@ router.post(path("/addBankToken"), function(req, res) {
 						code: success
 					});
 			});
+		}
+	});
+});
+
+router.post(path('/addCourse'), function(req, res) {
+
+	var input = JSON.parse(req.body);
+	console.log(input);
+	var coursename = input['coursename'];
+
+	console.log(coursename);
+	console.log(typeof(coursename));
+	var identifier = input.userId;
+
+	User.findOne({
+		'identifier': identifier,
+	},
+	function(err, user) {
+		if (err || !user) {
+			console.log(err);
+			console.log(user)
+			res.send({
+				message: "FAILURE",
+				code: failure,
+			});
+		} else {
+			user.addCourse(coursename);
+			user.save(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						message: "FAILURE",
+						code: failure,
+					});
+				} else {
+					res.send({
+						message: "SUCESSS",
+						code: success,
+						data: user,
+					});
+				}
+			})
+		}
+	});
+});
+
+router.post(path('/addManyCourses'), function(req, res) {
+
+	var input = JSON.parse(req.body);
+	console.log(input);
+	var coursename = input['coursename'];
+
+	console.log(coursename);
+	console.log(typeof(coursename));
+	var identifier = input.userId;
+
+	User.findOne({
+		'identifier': identifier,
+	},
+	function(err, user) {
+		if (err || !user) {
+			console.log(err);
+			console.log(user)
+			res.send({
+				message: "FAILURE",
+				code: failure,
+			});
+		} else {
+			user.addManyCourses(coursename);
+			user.save(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						message: "FAILURE",
+						code: failure,
+					});
+				} else {
+					res.send({
+						message: "SUCESSS",
+						code: success,
+						data: user,
+					});
+				}
+			})
 		}
 	});
 });
