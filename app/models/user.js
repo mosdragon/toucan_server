@@ -3,7 +3,7 @@ var BankAccount = require("./bankAccount");
 var CreditCard = require("./creditCard");
 
 var reviewSchema = require("./review").schema;
-var baseRate = require("../../config").baseRate;
+var baseRate = require("../../config").dev.baseRate;
 
 var rateCollection = "Rates";
 var userCollection = "Users";
@@ -13,37 +13,6 @@ autoIncrement.initialize(mongoose);
 
 var bcrypt = require('bcrypt')
 var SALT_WORK_FACTOR = 12;
-
-// var rateSchema = new mongoose.Schema({
-// 	course: String,
-// 	rate: Number,
-// });
-
-// rateSchema.methods.getCourse = function() {
-// 	return this.course;
-// };
-
-// rateSchema.methods.getRate = function() {
-// 	return this.rate;
-// };
-
-// rateSchema.methods.setCourse = function(update) {
-// 	this.course = update;
-// };
-
-// rateSchema.methods.setRate = function(update) {
-// 	this.rate = update;
-// };
-
-// rateSchema.plugin(autoIncrement.plugin, {
-// 	model: rateCollection,
-// 	startAt: 104940,
-// 	incrementBy: (11 * 97 * 17),
-// });
-
-// var Rate = mongoose.model(rateCollection, rateSchema);
-
-
 
 var userSchema = new mongoose.Schema({
 
@@ -65,7 +34,7 @@ var userSchema = new mongoose.Schema({
 	// Only applies to tutors
 	_reviews: {type: [Number], ref: "Reviews", default: []},
 	coursesTaught: {type: [String], required: false, default: []},
-	hourlyRates: {type: Object, required: false, default: {}},
+	hourlyRates: {type: String, required: true, default:"{}"},
 	isCertified: {type: Boolean, default: false},
 	biography: {type: String},
 });
@@ -97,18 +66,16 @@ userSchema.methods.addReview = function(review) {this.reviews.push(review)};
 userSchema.methods.addCourse = function(coursename, rate) {
 	var setRate = rate? rate : baseRate;
 	
-	if (this.coursesTaught.indexOf(coursename) == -1) {
+	if (this.coursesTaught.indexOf(coursename) === -1) {
 	    // In the array!
 	    this.coursesTaught.push(coursename);
+	    var hourly = JSON.parse(this.hourlyRates);
+		hourly[coursename] = setRate;
+		this.hourlyRates = JSON.stringify(hourly);
 	}
-	if (!this.hourlyRates) {
-		this.hourlyRates = {};
-	}
-	this.hourlyRates[coursename] = rate;
 };
 
 userSchema.methods.addManyCourses = function(courses, rates) {
-	
 	for (var i = 0; i < courses.length; i++) {
 		this.addCourse(courses[i], baseRate);
 	}

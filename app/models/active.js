@@ -25,19 +25,8 @@ var activeSchema = new mongoose.Schema({
 	available: {type: Boolean, required: false, default: true},
 	coursesTaught: {type: [String], default: []},
 	// Using geospatial indexing -- format is [long, lat]
-	// location: {type: [Number], index: "2d", required: true},
 	location: { type: [Number], index: '2dsphere', required: true},
 });
-
-activeSchema.statics.milesToRadians = function(miles) {
-	var km = Math.floor(miles * milesToKM * 100) / 100;
-	return kmToRadians(km);
-};
-
-activeSchema.statics.kmToRadians = function(km) {
-	var radians = km / earthRadius; // approximate
-	return radians;
-};
 
 activeSchema.methods.setSession = function(params, callback) {
 	var session = new Session(params);

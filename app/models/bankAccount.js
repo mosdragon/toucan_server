@@ -29,20 +29,6 @@ bankAccountSchema.methods.addTransfer = function(transfer) {
 	this._transfers.push(transfer)
 };
 
-// bankAccountSchema.pre('save', function(next) {
-//     var self = this;
-
-//     // only if stripe_token added/modified
-//     if (self.isModified('stripe_token')) {
-//     	console.log("Modified stripe_token");
-// 	    self.setStripeId(self.stripe_token);
-// 	    return next();
-
-// 	} else {
-// 		return next();
-// 	}
-// });
-
 module.exports = mongoose.model(bankAccountCollection, bankAccountSchema);
 
 // // Create a Recipient

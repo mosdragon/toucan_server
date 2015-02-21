@@ -58,47 +58,6 @@ router.post(path('/registerUser'), function(req, res) {
 });
 
 
-// router.post(path('/verifyCredentials'), function(req, res) {
-// 	var input = JSON.parse(req.body);
-// 	var username = input.username;
-// 	var emailAddress = input.emailAddress;
-// 	var password = input.password;
-
-// 	Active.findOne({
-// 		// username: username,
-// 		"emailAddress": emailAddress,
-// 	}).exec(function(err, result) {
-// 		if (err) {
-// 			console.log(err);
-// 		} else if (result) {
-// 			console.log(result);
-// 			console.log(typeof(result));
-// 			console.log("time to check password");
-
-// 			result.comparePassword(password, function(err, isMatch) {
-// 				if (err || !isMatch) {
-// 					console.log(err);
-// 					res.send("BAD PASSWORD");
-// 				} else {
-// 					console.log("password is bueno. Good job grasshopper");
-// 					res.cookie("userId", result.identifier);
-// 					res.send({
-// 						msg: "VERIFIED",
-// 						code: success,
-// 						userId: result.identifier
-// 					});
-// 				}
-// 			});			
-// 		} else {
-// 			res.send({
-// 				msg: "FAILURE"
-// 			});
-// 		}
-// 	});
-// });
-
-// Client Apps only
-
 router.post(path("/addBankToken"), function(req, res) {
 	var input = JSON.parse(req.body);
 	var identifier = input.userId;
@@ -186,11 +145,7 @@ router.post(path("/addCardToken"), function(req, res) {
 router.post(path('/addCourse'), function(req, res) {
 
 	var input = JSON.parse(req.body);
-	console.log(input);
-	var coursename = input['coursename'];
-
-	console.log(coursename);
-	console.log(typeof(coursename));
+	var course = input['course'];
 	var identifier = input.userId;
 
 	User.findOne({
@@ -198,14 +153,12 @@ router.post(path('/addCourse'), function(req, res) {
 	},
 	function(err, user) {
 		if (err || !user) {
-			console.log(err);
-			console.log(user)
 			res.send({
 				message: "FAILURE",
 				code: failure,
 			});
 		} else {
-			user.addCourse(coursename);
+			user.addCourse(course);
 			user.save(function(err) {
 				if (err) {
 					console.log(err);
@@ -228,11 +181,7 @@ router.post(path('/addCourse'), function(req, res) {
 router.post(path('/addManyCourses'), function(req, res) {
 
 	var input = JSON.parse(req.body);
-	console.log(input);
-	var coursename = input['coursename'];
-
-	console.log(coursename);
-	console.log(typeof(coursename));
+	var courses = input.courses;
 	var identifier = input.userId;
 
 	User.findOne({
@@ -247,7 +196,7 @@ router.post(path('/addManyCourses'), function(req, res) {
 				code: failure,
 			});
 		} else {
-			user.addManyCourses(coursename);
+			user.addManyCourses(courses);
 			user.save(function(err) {
 				if (err) {
 					console.log(err);
@@ -362,40 +311,22 @@ router.post(path("/activeTutor"), function(req, res) {
 
 // Distance conversion factors
 var milesToKM = 1.60934;
-var earthRadius = 6371; // in KM
-
-var kmToRadians = function(km) {
-	// var radians = km / earthRadius; // approximate
-	// return radians;
-	var degrees = km/111.12;
-	return degrees;
-};
-
-var milesToRadians = function(miles) {
-	// var km = Math.floor(miles * milesToKM * 100) / 100;
-	var km = miles * milesToKM;
-	return kmToRadians(km);
-};
-
-var milesToM = function(miles) {
+var milesToMeters = function(miles) {
 	var km = miles * milesToKM;
 	return km * 1000;
 }
 
 router.post(path("/findActiveTutors"), function(req, res) {
 	var input = JSON.parse(req.body);
-	// var identifier = input.userId;
 
 	var hourLater = new Date();
-	hourLater.setHours(hourLater.getHours() + 4);
+	hourLater.setHours(hourLater.getHours() + 1);
 
 	var endTime = hourLater;
 	var latitude = input.latitude;
 	var longitude = input.longitude;
 	var course = input.course;
-	var miles = 3;
-	var maxDistRadians = milesToRadians(miles);
-	console.log(maxDistRadians);
+	var miles = input.miles ? parseInt(input.miles) : 3;
 
 
 	var params = {
@@ -412,7 +343,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 		    	},
 		    	// $maxDistance: <distance in meters>,
 		    	// $minDistance: <distance in meters>
-		    	$maxDistance: milesToM(miles),
+		    	$maxDistance: milesToMeters(miles), // <distance in meters>
 		  	}
 	    },
 
@@ -434,10 +365,25 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	        	code: failure,
 	        });
 	    } else {
+	    	var tutors = [];
+	    	console.log(actives)
+	    	actives.forEach(function(active) {
+	    		var data = active._tutor.toObject();
+	    		console.log(active);
+	    		console.log(data);
+	    		var tutor = {};
+	    		tutor.name = data.firstName + " " + data.lastName;
+	    		tutor.reviews = data._reviews;
+	    		tutor.isCertified = data.isCertified;
+	    		tutor.rate = JSON.parse(data.hourlyRates)[course]; 
+	    		tutor.course = course;
+	    		tutor.biography = data.biography;
+	    		tutors.push(tutor);
+	    	});
 	    	res.send({
 	    		msg: "SUCCESS",
 	    		code: success,
-	    		data: actives,
+	    		data: tutors,
 	    	})
 	    }
 	});
