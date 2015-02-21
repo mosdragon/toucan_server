@@ -1,5 +1,7 @@
 var mongoose = require("../../db");
 var BankAccount = require("./bankAccount");
+var CreditCard = require("./creditCard");
+
 var reviewSchema = require("./review").schema;
 var baseRate = require("../../config").baseRate;
 
@@ -113,24 +115,25 @@ userSchema.methods.addManyCourses = function(courses, rates) {
 };
 
 
-userSchema.methods.addBankAccountInfo = function(info, callback) {
+userSchema.methods.addBankToken = function(info, callback) {
 	var self = this;
 
 	var user = self._id;
 	var userEmail = self.emailAddress;
     var stripe_token = info.stripe_token;
-    console.log(stripe_token);
     var legal_name = info.legal_name;
+    var accountNumber = info.accountNumber;
 
     var params = {
     	'_user': user,
     	'userEmail': userEmail,
     	'stripe_token': stripe_token,
+    	'stripe_id': String(stripe_token.id),
     	'legal_name': legal_name
     };
-    console.log(params);
 
     var addition = new BankAccount(params);
+    addition.setAccountNumber(accountNumber);
     addition.save(function(err) {
     	if (err) {
     		console.log(err);
@@ -146,41 +149,41 @@ userSchema.methods.addBankAccountInfo = function(info, callback) {
 	    	});
 	    }
     });
-    // self._bankAccounts.push(addition); 
-}
+};
 
-userSchema.methods.addBankToken = function(info, callback) {
+userSchema.methods.addCardToken = function(info, callback) {
 	var self = this;
 
 	var user = self._id;
 	var userEmail = self.emailAddress;
-    var bank_token = info.bank_token;
-    var legal_name = info.legal_name;
+    var stripe_token = info.stripe_token;
+    var cardNumber = info.cardNumber;
 
     var params = {
     	'_user': user,
     	'userEmail': userEmail,
-    	'stripe_token': bank_token,
-    	'legal_name': legal_name
+    	'stripe_token': stripe_token,
+    	'stripe_id': String(stripe_token.id),
     };
 
-    var addition = new BankAccount(params);
+    var addition = new CreditCard(params);
+    addition.setCardNumber(cardNumber);
     addition.save(function(err) {
     	if (err) {
     		console.log(err);
     		return callback(err);
-    	}
-    	self._bankAccounts.push(addition._id);
-    	self.save(function(err) {
-	    	if (err) {
-	    		return callback(err);
-	    		console.log(err);
-	    	}
-	    	return callback(err, addition);
-	    });
+    	} else {
+	    	self._creditCards.push(addition._id);
+	    	self.save(function(err) {
+		    	if (err) {
+		    		return callback(err);
+		    		console.log(err);
+		    	}
+		    	return callback(err, addition);
+	    	});
+	    }
     });
-    // self._bankAccounts.push(addition); 
-}
+};
 
 // Hash Password
 userSchema.pre('save', function(next) {

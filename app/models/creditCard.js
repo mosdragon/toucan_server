@@ -24,9 +24,9 @@ var creditCardSchema = new mongoose.Schema({
 	_user: {type: Number, ref: "Users"},
 	_charges: {type: [Number], ref: "Charges"},
 	userEmail: String,
-    blurred_number: {type: String, default: "XXXX-XXXX-XXXX-"},
-    stripe_id: {type: String},
-    stripe_token: {type: Object},
+    cardNumber: {type: String, default: "XXXX-XXXX-XXXX-"},
+    stripe_id: {type: String, unique: true},
+    stripe_token: {type: Object, unique: true},
 });
 
 creditCardSchema.plugin(autoIncrement.plugin, {
@@ -35,17 +35,13 @@ creditCardSchema.plugin(autoIncrement.plugin, {
 	incrementBy: (13 * 403 * 17),
 });
 
-creditCardSchema.methods.setStripeId = function() {
-	this.stripe_id = stripe_token.id;
-};
-
-creditCardSchema.methods.setBlurredNumber = function(input) {
-	this.blurred_number += input;
-};
-
 creditCardSchema.methods.addCharge = function(charge) {
 	this._charges.push(charge)
 };
+
+creditCardSchema.methods.setCardNumber = function(card) {
+	this.cardNumber += String(card);
+}
 
 module.exports = mongoose.model(creditCardCollection, creditCardSchema);
 

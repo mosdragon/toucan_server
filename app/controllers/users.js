@@ -104,11 +104,13 @@ router.post(path("/addBankToken"), function(req, res) {
 	var identifier = input.userId;
 	var stripe_token = input.bank_token;
 	var legal_name = input.legal_name;
+	var accountNumber = input.accountNumber; // ex: XXX-XXX-XXX-1234. 1234 is the accountNumber number
 
 	var params = {
 		"identifier": identifier,
 		"stripe_token": stripe_token,
 		"legal_name": legal_name,
+		"accountNumber": accountNumber,
 	}
 	console.log("addToken params");
 	console.log(params);
@@ -122,7 +124,48 @@ router.post(path("/addBankToken"), function(req, res) {
 				code: failure,
 			});
 		} else {
-			result.addBankAccountInfo(params, function(err, result) {
+			result.addBankToken(params, function(err, result) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						error: err,
+						code: failure
+					});
+				}
+				res.send({
+						msg: "SUCESSS",
+						code: success
+					});
+			});
+		}
+	});
+});
+
+router.post(path("/addCardToken"), function(req, res) {
+	var input = JSON.parse(req.body);
+	var identifier = input.userId;
+	var stripe_token = input.bank_token;
+	var cardNumber = input.cardNumber; // ex: XXX-XXX-XXX-1234. 1234 is the cardNumber number
+
+	var params = {
+		"identifier": identifier,
+		"stripe_token": stripe_token,
+		"cardNumber": cardNumber,
+	}
+	console.log("addToken params");
+	console.log(params);
+	User.findOne({
+		'identifier': identifier
+	}).exec(function(err, result) {
+		if (err || !result) {
+			console.log(err);
+			res.send({
+				msg: "ERRORORR",
+				code: failure,
+			});
+		} else {
+			result.addCardToken(params, function(err, result) {
 				if (err) {
 					console.log(err);
 					res.send({

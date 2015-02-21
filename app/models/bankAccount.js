@@ -7,12 +7,12 @@ autoIncrement.initialize(mongoose);
 var bankAccountSchema = new mongoose.Schema({
 	_user: {type: Number, ref: "Users"},
 	_transfers: {type: [Number], ref: "Transfers", default: []},
-	stipe_id: {type: String, unique: true},
+	stripe_id: {type: String, unique: true},
 	stripe_token: {type: Object, required: true, unique: true},
 	nickname: {type: String},
 	userEmail: String,
     legal_name: String,
-    blurred_number: {type: String, default: "XXXX-XXXX-XXXX-"},
+    accountNumber: {type: String, default: "XXXX-XXXX-XXXX-"},
 });
 
 bankAccountSchema.plugin(autoIncrement.plugin, {
@@ -21,31 +21,27 @@ bankAccountSchema.plugin(autoIncrement.plugin, {
 	incrementBy: (93 * 91 * 17),
 });
 
-bankAccountSchema.methods.setStripeId = function(token) {
-	this.stripe_id = token.id;
-}
-
-bankAccountSchema.methods.setBlurredNumber = function(input) {
-	this.blurred_number += String(input);
+bankAccountSchema.methods.setAccountNumber = function(account) {
+	this.accountNumber += String(account);
 }
 
 bankAccountSchema.methods.addTransfer = function(transfer) {
 	this._transfers.push(transfer)
 };
 
-bankAccountSchema.pre('save', function(next) {
-    var self = this;
+// bankAccountSchema.pre('save', function(next) {
+//     var self = this;
 
-    // only if stripe_token added/modified
-    if (self.isModified('stripe_token')) {
-    	console.log("Modified stripe_token");
-	    self.setStripeId(self.stripe_token);
-	    return next();
+//     // only if stripe_token added/modified
+//     if (self.isModified('stripe_token')) {
+//     	console.log("Modified stripe_token");
+// 	    self.setStripeId(self.stripe_token);
+// 	    return next();
 
-	} else {
-		return next();
-	}
-});
+// 	} else {
+// 		return next();
+// 	}
+// });
 
 module.exports = mongoose.model(bankAccountCollection, bankAccountSchema);
 
