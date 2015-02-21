@@ -7,8 +7,8 @@ autoIncrement.initialize(mongoose);
 var bankAccountSchema = new mongoose.Schema({
 	_user: {type: Number, ref: "Users"},
 	_transfers: {type: [Number], ref: "Transfers", default: []},
-	stipe_id: {type: String},
-	stripe_token: {type: Object},
+	stipe_id: {type: String, unique: true},
+	stripe_token: {type: Object, required: true, unique: true},
 	nickname: {type: String},
 	userEmail: String,
     legal_name: String,
@@ -21,8 +21,8 @@ bankAccountSchema.plugin(autoIncrement.plugin, {
 	incrementBy: (93 * 91 * 17),
 });
 
-bankAccountSchema.methods.setStripeId = function() {
-	this.stripe_id = stripe_token.id;
+bankAccountSchema.methods.setStripeId = function(token) {
+	this.stripe_id = token.id;
 }
 
 bankAccountSchema.methods.setBlurredNumber = function(input) {
@@ -38,8 +38,9 @@ bankAccountSchema.pre('save', function(next) {
 
     // only if stripe_token added/modified
     if (self.isModified('stripe_token')) {
-
-	    self.setStripeId();
+    	console.log("Modified stripe_token");
+	    self.setStripeId(self.stripe_token);
+	    return next();
 
 	} else {
 		return next();

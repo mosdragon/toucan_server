@@ -22,10 +22,11 @@ var activeSchema = new mongoose.Schema({
 	_session: {type: Number, ref: "Sessions"}, // session will be created once a tutor and tutee connect
 	beginTime: {type: Date},
 	endTime: {type: Date},
-	available: {type: Boolean, required: true, default: true},
+	available: {type: Boolean, required: false, default: true},
 	coursesTaught: {type: [String], default: []},
 	// Using geospatial indexing -- format is [long, lat]
-	location: {type: [Number], index: "2d", required: true},
+	// location: {type: [Number], index: "2d", required: true},
+	location: { type: [Number], index: '2dsphere', required: true},
 });
 
 activeSchema.statics.milesToRadians = function(miles) {

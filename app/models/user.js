@@ -118,30 +118,33 @@ userSchema.methods.addBankAccountInfo = function(info, callback) {
 
 	var user = self._id;
 	var userEmail = self.emailAddress;
-    var bank_account = info.bank_account;
+    var stripe_token = info.stripe_token;
+    console.log(stripe_token);
     var legal_name = info.legal_name;
 
     var params = {
     	'_user': user,
     	'userEmail': userEmail,
-    	'bank_account': bank_account,
+    	'stripe_token': stripe_token,
     	'legal_name': legal_name
     };
+    console.log(params);
 
     var addition = new BankAccount(params);
     addition.save(function(err) {
     	if (err) {
     		console.log(err);
     		return callback(err);
-    	}
-    	self._bankAccounts.push(addition._id);
-    	self.save(function(err) {
-	    	if (err) {
-	    		return callback(err);
-	    		console.log(err);
-	    	}
-	    	return callback(err, addition);
-	    });
+    	} else {
+	    	self._bankAccounts.push(addition._id);
+	    	self.save(function(err) {
+		    	if (err) {
+		    		return callback(err);
+		    		console.log(err);
+		    	}
+		    	return callback(err, addition);
+	    	});
+	    }
     });
     // self._bankAccounts.push(addition); 
 }

@@ -102,6 +102,16 @@ router.post(path('/registerUser'), function(req, res) {
 router.post(path("/addBankToken"), function(req, res) {
 	var input = JSON.parse(req.body);
 	var identifier = input.userId;
+	var stripe_token = input.bank_token;
+	var legal_name = input.legal_name;
+
+	var params = {
+		"identifier": identifier,
+		"stripe_token": stripe_token,
+		"legal_name": legal_name,
+	}
+	console.log("addToken params");
+	console.log(params);
 	User.findOne({
 		'identifier': identifier
 	}).exec(function(err, result) {
@@ -112,7 +122,7 @@ router.post(path("/addBankToken"), function(req, res) {
 				code: failure,
 			});
 		} else {
-			result.addBankAccountInfo(input, function(err, result) {
+			result.addBankAccountInfo(params, function(err, result) {
 				if (err) {
 					console.log(err);
 					res.send({
@@ -257,10 +267,13 @@ router.post(path("/activeTutor"), function(req, res) {
 	var input = JSON.parse(req.body);
 	var identifier = input.userId;
 
-	var hourLater = new Date();
-	hourLater.setHours(hourLater.getHours() + 1);
-
 	var beginTime = input.beginTime ? input.beginTime : new Date();
+
+	var hourLater = new Date(beginTime);
+	hourLater.setHours(hourLater.getHours() + 1);
+	console.log("hour later");
+	console.log(hourLater);
+
 	var endTime = input.endTime ? input.endTime : hourLater;
 	var latitude = input.latitude;
 	var longitude = input.longitude;
@@ -269,6 +282,7 @@ router.post(path("/activeTutor"), function(req, res) {
 		"beginTime": beginTime,
 		"endTime": endTime,
 		"location": [longitude, latitude],
+		"available": true,
 	}
 
 	User.findOne({
@@ -308,14 +322,22 @@ var milesToKM = 1.60934;
 var earthRadius = 6371; // in KM
 
 var kmToRadians = function(km) {
-	var radians = km / earthRadius; // approximate
-	return radians;
+	// var radians = km / earthRadius; // approximate
+	// return radians;
+	var degrees = km/111.12;
+	return degrees;
 };
 
 var milesToRadians = function(miles) {
-	var km = Math.floor(miles * milesToKM * 100) / 100;
+	// var km = Math.floor(miles * milesToKM * 100) / 100;
+	var km = miles * milesToKM;
 	return kmToRadians(km);
 };
+
+var milesToM = function(miles) {
+	var km = miles * milesToKM;
+	return km * 1000;
+}
 
 router.post(path("/findActiveTutors"), function(req, res) {
 	var input = JSON.parse(req.body);
@@ -330,6 +352,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	var course = input.course;
 	var miles = 3;
 	var maxDistRadians = milesToRadians(miles);
+	console.log(maxDistRadians);
 
 
 	var params = {
@@ -339,17 +362,25 @@ router.post(path("/findActiveTutors"), function(req, res) {
 
 	Active.find({  
 	    location: {
-	        $near: params.location,
-	        $maxDistance: maxDistRadians,
+	        $near: {
+		    	$geometry: {
+	        		type: "Point" ,
+	        		coordinates: params.location
+		    	},
+		    	// $maxDistance: <distance in meters>,
+		    	// $minDistance: <distance in meters>
+		    	$maxDistance: milesToM(miles),
+		  	}
 	    },
+
 	    coursesTaught: {
 	    	$in: [course],
 	    },
-	    // available: true, // this is the problem!!
-	    // endTime: {  // this is the problem too!!
-	    // 	$lt: params.endTime,
-	    // 	$gte: (new Date()),
-	    // }
+	    available: true,
+	    endTime: {
+	    	$lt: params.endTime,
+	    	$gte: (new Date()),
+	    }
 	})
 	.populate("_tutor")
 	.exec(function(err, actives) {
