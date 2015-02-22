@@ -50,11 +50,11 @@ router.post(path('/registerUser'), function(req, res) {
 			console.log(err);
 		} else {
 			console.log(member);
-			res.cookie("userId", member.identifier);
+			res.cookie("userId", member._id);
 			res.send({
 				msg: "VERIFIED",
 				code: success,
-				userId: member.identifier
+				userId: member._id,
 			});
 		}
 		// resetCount(member);
@@ -64,21 +64,20 @@ router.post(path('/registerUser'), function(req, res) {
 
 router.post(path("/addBankToken"), function(req, res) {
 	var input = JSON.parse(req.body);
-	var identifier = input.userId;
+	var _id = input.userId;
 	var stripe_token = input.bank_token;
 	var legal_name = input.legal_name;
 	var accountNumber = input.accountNumber; // ex: XXX-XXX-XXX-1234. 1234 is the accountNumber number
 
 	var params = {
-		"identifier": identifier,
+		"_id": _id,
 		"stripe_token": stripe_token,
 		"legal_name": legal_name,
 		"accountNumber": accountNumber,
 	}
-	console.log("addToken params");
-	console.log(params);
+
 	User.findOne({
-		'identifier': identifier
+		'_id': _id,
 	}).exec(function(err, result) {
 		if (err || !result) {
 			console.log(err);
@@ -107,19 +106,18 @@ router.post(path("/addBankToken"), function(req, res) {
 
 router.post(path("/addCardToken"), function(req, res) {
 	var input = JSON.parse(req.body);
-	var identifier = input.userId;
+	var _id = input.userId;
 	var stripe_token = input.bank_token;
 	var cardNumber = input.cardNumber; // ex: XXX-XXX-XXX-1234. 1234 is the cardNumber number
 
 	var params = {
-		"identifier": identifier,
+		"_id": _id,
 		"stripe_token": stripe_token,
 		"cardNumber": cardNumber,
-	}
-	console.log("addToken params");
-	console.log(params);
+	};
+
 	User.findOne({
-		'identifier': identifier
+		'_id': _id,
 	}).exec(function(err, result) {
 		if (err || !result) {
 			console.log(err);
@@ -138,9 +136,9 @@ router.post(path("/addCardToken"), function(req, res) {
 					});
 				}
 				res.send({
-						msg: "SUCESSS",
-						code: success
-					});
+					msg: "SUCESSS",
+					code: success
+				});
 			});
 		}
 	});
@@ -150,10 +148,10 @@ router.post(path('/addCourse'), function(req, res) {
 
 	var input = JSON.parse(req.body);
 	var course = input['course'];
-	var identifier = input.userId;
+	var userId = input.userId;
 
 	User.findOne({
-		'identifier': identifier,
+		'_id': userId,
 	},
 	function(err, user) {
 		if (err || !user) {
@@ -186,10 +184,10 @@ router.post(path('/addManyCourses'), function(req, res) {
 
 	var input = JSON.parse(req.body);
 	var courses = input.courses;
-	var identifier = input.userId;
+	var userId = input.userId;
 
 	User.findOne({
-		'identifier': identifier,
+		'_id': userId,
 	},
 	function(err, user) {
 		if (err || !user) {
@@ -232,20 +230,25 @@ router.post(path('/login'), function(req, res) {
 	}).exec(function(err, result) {
 		if (err) {
 			console.log(err);
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				error: err,
+			});
 		} else if (result) {
-			console.log(result);
-			console.log(typeof(result));
-			console.log("time to check password");
 
 			result.comparePassword(password, function(err, isMatch) {
 				if (err || !isMatch) {
 					console.log(err);
-					res.send("BAD PASSWORD");
-				} else {
-					console.log("password is bueno. Good job grasshopper");
 					res.send({
-						msg: "VERIFIED",
-						userId: result.identifier,
+						msg: "FAILURE",
+						code: failure,
+						reason: "Bad username or password",
+					});
+				} else {
+					res.send({
+						msg: "SUCCESS",
+						userId: result._id,
 						code: success,
 					});
 				}
@@ -254,6 +257,7 @@ router.post(path('/login'), function(req, res) {
 			res.send({
 				msg: "FAILURE",
 				code: failure,
+				reason: "Bad username or password",
 			});
 		}
 	});
@@ -261,7 +265,7 @@ router.post(path('/login'), function(req, res) {
 
 router.post(path("/activeTutor"), function(req, res) {
 	var input = JSON.parse(req.body);
-	var identifier = input.userId;
+	var userId = input.userId;
 
 	var beginTime = input.beginTime ? input.beginTime : new Date();
 
@@ -282,14 +286,13 @@ router.post(path("/activeTutor"), function(req, res) {
 	}
 
 	User.findOne({
-		'identifier': identifier
+		'_id': userId
 	}).exec(function(err, user) {
 		if (err || !user) {
-			console.log(err);
-			console.log(user);
 			res.send({
-				msg: "ERRORORR",
+				msg: "FAILURE",
 				code: failure,
+				error: err,
 			});
 		} else {
 			console.log("USER FOUND");
@@ -376,7 +379,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    		tutor.rate = rates[course];
 	    		
 	    		tutor.biography = data.biography;
-	    		tutor.tutorId = data.identifier;
+	    		tutor.tutorId = data._id;
 	    		tutors.push(tutor);
 	    	});
 	    	res.send({

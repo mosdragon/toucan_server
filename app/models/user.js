@@ -46,14 +46,6 @@ userSchema.plugin(autoIncrement.plugin, {
 	incrementBy: 13 * 13,
 });
 
-userSchema.plugin(autoIncrement.plugin, {
-	model: userCollection,
-	startAt: 6007949,
-	// Multiplying two prime numbers together to make it harder to guess
-	incrementBy: 7 * 21,
-	field: 'identifier',
-});
-
 // Array fields can have single pieces of data pushed to them
 
 userSchema.methods.addCreditCards = function(creditCard) {this._creditCards.push(creditCard)};

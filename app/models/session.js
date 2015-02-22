@@ -1,5 +1,5 @@
 var mongoose = require("../../db");
-var sessionCollection = "Sessions";
+var sessionCollection = "Session";
 
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
