@@ -11,7 +11,7 @@ var milesToMeters = require("../../util").milesToMeters;
 var success = 200;
 var failure = 500;
 
-var basepath = "/sessions";
+var basepath = "";
 var path = function(addition) {
 	return basepath + addition;
 }
@@ -23,18 +23,21 @@ router.post(path('/selectTutor'), function(req, res) {
 	var studentPhone = input.studentPhone;
 	var course = input.course;
 
-	Active.find({  
+	Active.findOne({  
 	    _tutor: tutorId
 	})
 	// .populate("_tutor")
 	.exec(function(err, active) {
 		if (err || !active) {
 			console.log(err);
+			console.log("First error block");
 			res.send({
 				msg: "Something went wrong. Please try another tutor.",
 				code: failure,
 			});
 		} else if(!active.available) {
+			console.log(active);
+			console.log(active.available);
 			console.log("Tutor not available");
 			res.send({
 				msg: "It looks like this tutor is no longer available. Please try another tutor.",
@@ -80,12 +83,11 @@ router.post(path('/selectTutor'), function(req, res) {
 								tutorPhone: tutorPhone,
 							});
 						}
-					})
+					});
 				}
-
 			});
 		}
-	}
+	});
 });
 
 

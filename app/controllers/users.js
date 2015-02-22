@@ -17,15 +17,28 @@ var path = function(addition) {
 }
 
 router.post(path('/registerUser'), function(req, res) {
-	console.log("Creating user");
-	console.log(req.body);
-	console.log(typeof(req.body));
-
 	var input = JSON.parse(req.body);
-	console.log(input);
-	console.log(typeof(input));
 
-	var member = new User(input);
+	var firstName = input.firstName;
+	var lastName = input.lastName;
+	var phoneNumber = input.phoneNumber;
+	var username = input.username;
+	var password = input.password;
+	var emailAddress = input.emailAddress;
+	// This will be null at time -> defaults to "TUTEE"
+	var userType = input.userType ? input.userType : "TUTEE";
+
+	var params = {
+		'firstName': firstName,
+		'lastName': lastName,
+		'phoneNumber': phoneNumber,
+		'username': username,
+		'password': password,
+		'emailAddress': emailAddress,
+		'userType': userType,
+	};
+
+	var member = new User(params);
 	console.log("MEMBER");
 	console.log(member);
 	member.save(function(err) {
