@@ -6,24 +6,15 @@ var Active = require("../models/active");
 
 var basepath = "/users";
 
+// Function to convert miles to meters
+var milesToMeters = require("../../util").milesToMeters;
+
 var success = 200;
 var failure = 500;
 
 var path = function(addition) {
 	return basepath + addition;
 }
-
-var checkIfExists = function(emailAddress) {
-	console.log("checkIfExists");
-	schema.find({"emailAddress": emailAddress}).exec(function(err, result) {
-		if (err) {
-			console.log(err);
-		} else {
-			console.log(result);
-
-		}
-	});
-};
 
 router.post(path('/registerUser'), function(req, res) {
 	console.log("Creating user");
@@ -309,12 +300,6 @@ router.post(path("/activeTutor"), function(req, res) {
 	});
 });
 
-// Distance conversion factors
-var milesToKM = 1.60934;
-var milesToMeters = function(miles) {
-	var km = miles * milesToKM;
-	return km * 1000;
-}
 
 router.post(path("/findActiveTutors"), function(req, res) {
 	var input = JSON.parse(req.body);
@@ -357,7 +342,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    }
 	})
 	.populate("_tutor")
-	.exec(function(err, actives) {
+	.exec(function(err, availableTutors) {
 	    if (err) {
 	    	console.log(err);
 	        res.send({
@@ -366,25 +351,26 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	        });
 	    } else {
 	    	var tutors = [];
-	    	console.log(actives)
-	    	actives.forEach(function(active) {
-	    		var data = active._tutor.toObject();
-	    		console.log(active);
-	    		console.log(data);
+	    	availableTutors.forEach(function(availableTutor) {
+	    		var data = availableTutor._tutor.toObject();
 	    		var tutor = {};
 	    		tutor.name = data.firstName + " " + data.lastName;
 	    		tutor.reviews = data._reviews;
 	    		tutor.isCertified = data.isCertified;
-	    		tutor.rate = JSON.parse(data.hourlyRates)[course]; 
+
+	    		var rates = JSON.parse(data.hourlyRates);
 	    		tutor.course = course;
+	    		tutor.rate = rates[course];
+	    		
 	    		tutor.biography = data.biography;
+	    		tutor.tutorId = data.identifier;
 	    		tutors.push(tutor);
 	    	});
 	    	res.send({
 	    		msg: "SUCCESS",
 	    		code: success,
-	    		data: tutors,
-	    	})
+	    		tutors: tutors,
+	    	});
 	    }
 	});
 });

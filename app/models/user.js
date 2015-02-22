@@ -21,6 +21,7 @@ var userSchema = new mongoose.Schema({
 	_bankAccounts: {type: [Number], ref: "BankAccounts", default: []},
 	firstName: String,
 	lastName: String,
+	phoneNumber: {type: String, required: true},
 	username: {type: String, unique:  true},
 	emailAddress: {type: String, unique: true},
 	password: String,

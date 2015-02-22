@@ -6,13 +6,14 @@ autoIncrement.initialize(mongoose);
 
 var sessionSchema = new mongoose.Schema({
 	_tutor: {type: Number, ref: "User", required: true},
-	tutorPhone: Number,
+	tutorPhone: String,
 	_student: {type: Number, ref: "User", required: true},
-	studentPhone: Number,
+	studentPhone: String,
 	appointmentCreated: {type: Date, default: new Date()},
 	appointmentBegin: Date,
 	appointmentEnd: Date,
 	hoursOfService: Number,
+	course: String,
 	hourlyRate: Number,
 	totalCost: Number,
 	_creditCard: {type: Number, ref: "CreditCard"},
@@ -23,7 +24,9 @@ sessionSchema.methods.beginAppointment = function() {
 };
 
 sessionSchema.methods.endAppointment = function() {
-	this.appointmentEnd = new Date();
+	var self = this;
+	
+	self.appointmentEnd = new Date();
 
 	// Gets hours up-to 2 decimal places
 	var hours = Math.floor((Math.abs(date1 - date2) / 36e5) * 100) / 100;
@@ -37,19 +40,19 @@ sessionSchema.methods.endAppointment = function() {
 		total = 0.75;
 	} else if (partialHours > 0.25) {
 		total = 0.50;
-	} else if (partialHours > 0.01) {
+	} else if (partialHours > 0.03) {
 		total = 0.25;
 	}
 
 	total += fullHours;
 
-	this.hoursOfService = total;
+	self.hoursOfService = total;
 
 	// Rounds amount due to 2 decimal places/ to pennies
-	var amountDue = Math.floor(this.hoursOfService * this.hourlyRate * 100) / 100;
-	this.totalCost = amountDue;
+	var amountDue = Math.floor(self.hoursOfService * self.hourlyRate * 100) / 100;
+	self.totalCost = amountDue;
 
-	this.makePayment();
+	self.makePayment();
 };
 
 sessionSchema.methods.makePayment = function() {
