@@ -20,8 +20,8 @@ var activeSchema = new mongoose.Schema({
 
 	_tutor: {type: Number, ref: "Users", unique: true},
 	_session: {type: Number, ref: "Sessions"}, // session will be created once a tutor and tutee connect
-	beginTime: {type: Date},
-	endTime: {type: Date},
+	beginTime: {type: Date, default: (new Date())},
+	endTime: {type: Date, required: true},
 	available: {type: Boolean, default: true},
 	coursesTaught: {type: [String], default: []},
 	// Using geospatial indexing -- format is [long, lat]

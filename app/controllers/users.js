@@ -107,7 +107,7 @@ router.post(path("/addBankToken"), function(req, res) {
 router.post(path("/addCardToken"), function(req, res) {
 	var input = JSON.parse(req.body);
 	var _id = input.userId;
-	var stripe_token = input.bank_token;
+	var stripe_token = input.card_token;
 	var cardNumber = input.cardNumber; // ex: XXX-XXX-XXX-1234. 1234 is the cardNumber number
 
 	var params = {
@@ -298,17 +298,40 @@ router.post(path("/activeTutor"), function(req, res) {
 			console.log("USER FOUND");
 			params._tutor = user._id;
 			params.coursesTaught = user.coursesTaught;
-			Active.update({_tutor: user._id}, params, {upsert: true}, function(err) {
-				if (err) {
+			Active.findOne({_tutor: user._id}, function(err, active) {
+				if (err || !active) {
 					console.log(err);
-					res.send({
-						msg: "ERRORORR",
-						code: failure,
+					console.log(active);
+					// No active exists for this person. Create a new one.
+					var active = new Active(params);
+					active.save(function(err) {
+						if (err) {
+							console.log(err);
+							res.send({
+								msg: "ERRORORR",
+								code: failure,
+							});
+						} else {
+							res.send({
+								msg: "SUCESSS",
+								code: success,
+							});
+						}
 					});
 				} else {
-					res.send({
-						msg: "SUCESSS",
-						code: success,
+					active.update(params, function(err) {
+						if (err) {
+							console.log(err);
+							res.send({
+								msg: "ERRORORR",
+								code: failure,
+							});
+						} else {
+							res.send({
+								msg: "SUCESSS",
+								code: success,
+							});
+						}
 					});
 				}
 			});

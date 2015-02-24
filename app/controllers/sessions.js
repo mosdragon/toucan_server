@@ -85,7 +85,7 @@ router.post(path('/selectTutor'), function(req, res) {
 								msg: "SUCCESS",
 								code: success,
 								tutorPhone: tutorPhone,
-								tutorName: tutor.firstName,
+								tutorName: tutor.firstName + " " + tutor.lastName,
 								sessionId: session._id,
 							});
 						}		
