@@ -4,6 +4,7 @@ var CreditCard = require("./creditCard");
 
 var reviewSchema = require("./review").schema;
 var baseRate = require("../../config").dev.baseRate;
+var baseRateCertified = require("../../config").dev.baseRateCertified;
 
 var rateCollection = "Rates";
 var userCollection = "Users";

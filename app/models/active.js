@@ -10,12 +10,6 @@ var Session = require("./session");
 var bcrypt = require('bcrypt')
 var SALT_WORK_FACTOR = 12;
 
-
-// Distance conversion factors
-var milesToKM = 1.60934;
-var earthRadius = 6371; // in KM
-
-
 var activeSchema = new mongoose.Schema({
 
 	_tutor: {type: Number, ref: "Users", unique: true},

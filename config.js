@@ -5,7 +5,7 @@ var data = {
 		stripeApi: "sk_test_BQokikJOvBiI2HlWgH4olfQ2",
 		cookiePassword: "insertpasswordhere",
 		baseRate: 8,
-		
+		baseRateCertified: 18,
 	}
 };
 

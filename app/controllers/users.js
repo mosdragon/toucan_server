@@ -3,8 +3,11 @@ var router = express.Router();
 
 var User = require("../models/user");
 var Active = require("../models/active");
+var TutorCode = require("../models/tutorCode");
 
 var basepath = "/users";
+var baseRate = require("../../config").dev.baseRate;
+var baseRateCertified = require("../../config").dev.baseRateCertified;
 
 // Function to convert miles to meters
 var milesToMeters = require("../../util").milesToMeters;
@@ -413,5 +416,92 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    }
 	});
 });
+
+router.post(path("/generateTutorCode"), function(req, res) {
+	var input = JSON.parse(req.body);
+	// firstName: {type:firstName: {type: String, required: true},
+	// lastName: {type: String, required: true},
+	// emailAddress: {type: String, required: true},
+	// coursesTaught: {type: [String], required: true},
+	// isCertified: {type: Boolean, default: false},
+	// rates: {type: Object, required: true},
+	// tutorCode: {type: Number},
+	// codeUsed: {type: Boolean, default: false},
+	// timeUsed: {type: Date},
+	// dateCreated: {type: Date, default: (new Date())},
+
+	var firstName = input.firstName;
+	var lastName = input.lastName;
+	var emailAddress = input.emailAddress;
+	var coursesTaught = input.coursesTaught;
+	var isCertified = input.isCertified;
+	var rates = input.rates;
+
+	for (var index in coursesTaught) {
+		var coursename = coursesTaught[index];
+		if (!rates[coursename]) {
+			if (isCertified) {
+				rates[coursename] = baseRateCertified;
+			} else {
+				rates[coursename] = baseRate;
+			}
+		}
+	}
+
+	console.log("Ensured all courses have rates");
+	console.log(rates);
+
+	var params = {
+		firstName : firstName,
+		lastName : lastName,
+		emailAddress : emailAddress,
+		coursesTaught : coursesTaught,
+		isCertified : isCertified,
+		rates : rates,
+	};
+
+	var tutorCode = new TutorCode(params);
+	tutorCode.generateTutorCode(function(err, code) {
+		if (err) {
+			res.send({
+				err: err,
+				msg: "FAILURE",
+				code: failure,
+			});
+		} else {
+			res.send({
+				msg: "SUCESSS",
+				code: success,
+				tutorCode: code,
+				emailAddress: emailAddress,
+			});
+		}
+	});
+});
+
+router.post(path("/checkCodeUnused"), function(req, res) {
+	var input = JSON.parse(req.body);
+	var tutorCode = input.tutorCode;
+
+	TutorCode.findOne({
+		'tutorCode': tutorCode,
+	})
+	.exec(function(err, code) {
+		if (err || !code) {
+			res.send({
+				err: err,
+				msg: "FAILURE",
+				code: failure,
+			});
+		} else {
+			res.send({
+				msg: "SUCCESS",
+				code: success,
+				codeUsed: code.codeUsed,
+			});
+		}
+	});
+});
+
 
 module.exports = router;
