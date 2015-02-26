@@ -35,9 +35,9 @@ router.post(path('/selectTutor'), function(req, res) {
 				msg: "Something went wrong. Please try another tutor.",
 				code: failure,
 			});
-		} else if(!active.available) {
+		} else if(active && !active.available) {
 			console.log("tutor availability");
-			console.log(tutor.available);
+			console.log(active.available);
 			console.log("Tutor not available");
 			res.send({
 				msg: "It looks like this tutor is no longer available. Please try another tutor.",
