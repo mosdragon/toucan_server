@@ -5,7 +5,6 @@ var User = require("../models/user");
 var Active = require("../models/active");
 var TutorCode = require("../models/tutorCode");
 
-var basepath = "/users";
 var baseRate = require("../../config").dev.baseRate;
 var baseRateCertified = require("../../config").dev.baseRateCertified;
 
@@ -15,55 +14,10 @@ var milesToMeters = require("../../util").milesToMeters;
 var success = 200;
 var failure = 500;
 
+var basepath = "/users";
 var path = function(addition) {
 	return basepath + addition;
 }
-
-router.post(path('/registerUser'), function(req, res) {
-	var input = JSON.parse(req.body);
-
-	var firstName = input.firstName;
-	var lastName = input.lastName;
-	var phoneNumber = input.phoneNumber;
-	var username = input.username;
-	var password = input.password;
-	var emailAddress = input.emailAddress;
-	// This will be null at time -> defaults to "TUTEE"
-	var userType = input.userType ? input.userType : "TUTEE";
-
-	var params = {
-		'firstName': firstName,
-		'lastName': lastName,
-		'phoneNumber': phoneNumber,
-		'username': username,
-		'password': password,
-		'emailAddress': emailAddress,
-		'userType': userType,
-	};
-
-	var member = new User(params);
-	console.log("MEMBER");
-	console.log(member);
-	member.save(function(err) {
-		if (err) {
-			res.send({
-				msg: "ERRORORR",
-				code: failure,
-			});
-			console.log(err);
-		} else {
-			console.log(member);
-			res.cookie("userId", member._id);
-			res.send({
-				msg: "VERIFIED",
-				code: success,
-				userId: member._id,
-				isInSession: member.isInSession,
-			});
-		}
-		// resetCount(member);
-	});
-});
 
 router.post(path('/signupStudent'), function(req, res) {
 	var input = JSON.parse(req.body);
@@ -75,9 +29,9 @@ router.post(path('/signupStudent'), function(req, res) {
 	var password = input.password;
 	var emailAddress = input.emailAddress;
 	// This will be null at time -> defaults to "TUTEE"
-	var userType = input.userType ? input.userType : "TUTEE";
+	var userType = "TUTEE";
 
-	var params = {
+	var userParams = {
 		'firstName': firstName,
 		'lastName': lastName,
 		'phoneNumber': phoneNumber,
@@ -86,7 +40,7 @@ router.post(path('/signupStudent'), function(req, res) {
 		'emailAddress': emailAddress,
 		'userType': userType,
 	};
-	console.log(params);
+	console.log(userParams);
 
 	// Card Parameters
 	var stripe_token = input.card_token;
@@ -98,9 +52,8 @@ router.post(path('/signupStudent'), function(req, res) {
 	};
 	console.log(cardParams);
 
-	var member = new User(params);
-	// console.log("MEMBER");
-	// console.log(member);
+	var member = new User(userParams);
+
 	member.save(function(err) {
 		if (err) {
 			res.send({
@@ -119,17 +72,126 @@ router.post(path('/signupStudent'), function(req, res) {
 						msg: "FAILURE",
 						error: err,
 						code: failure
-					});
+					})
+				} else {
+					res.send({
+						msg: "SUCESSS",
+						code: success,
+						userId: member._id,
+						isInSession: member.isInSession,
+						userType: member.userType,
+					})
 				}
-				res.send({
-					msg: "SUCESSS",
-					code: success,
-					userId: member._id,
-					isInSession: member.isInSession,
-				});
 			});
 		}
-		// resetCount(member);
+	});
+});
+
+router.post(path('/signupTutor'), function(req, res) {
+	
+	var input = JSON.parse(req.body);
+	var firstName = input.firstName;
+	var lastName = input.lastName;
+	var phoneNumber = input.phoneNumber;
+	var username = input.username;
+	var password = input.password;
+	var emailAddress = input.emailAddress;
+	var tutorCode = input.tutorCode;
+
+	// Taking credit card AND bank info from a user makes them "BOTH" a 
+	// tutor and a tutee
+	var userType = "BOTH";
+
+	var userParams = {
+		'firstName': firstName,
+		'lastName': lastName,
+		'phoneNumber': phoneNumber,
+		'username': username,
+		'password': password,
+		'emailAddress': emailAddress,
+		'userType': userType,
+	};
+	console.log(userParams);
+
+	// Card Parameters
+	var card_token = input.card_token;
+	// ex: XXX-XXX-XXX-1234. 1234 is the cardNumber number
+	var cardNumber = input.cardNumber;
+	var cardParams = {
+		"stripe_token": card_token,
+		"cardNumber": cardNumber,
+	};
+	console.log(cardParams);
+
+	// Bank Parameters
+	var bank_token = input.bank_token;
+	var legal_name = input.legal_name;
+	// ex: XXX-XXX-XXX-1234. 1234 is the accountNumber number
+	var accountNumber = input.accountNumber;
+
+	var bankParams = {
+		"stripe_token": bank_token,
+		"legal_name": legal_name,
+		"accountNumber": accountNumber,
+	};
+	console.log(bankParams);
+
+	var member = new User(userParams);
+	// console.log("MEMBER");
+	// console.log(member);
+	member.save(function(err) {
+		if (err) {
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				err: err,
+			});
+			console.log(err);
+		} else {
+			console.log(member);
+			res.cookie("userId", member._id);
+
+			member.addCardToken(cardParams, function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						error: err,
+						code: failure
+					});
+				} else {
+					member.addBankToken(bankParams, function(err) {
+						if (err) {
+							console.log(err);
+							res.send({
+								msg: "FAILURE",
+								error: err,
+								code: failure,
+							});
+						} else {
+							member.useTutorCode(tutorCode, function(err) {
+								if (err) {
+									// console.log(err);
+									res.send({
+										msg: "FAILURE",
+										error: err.mesage,
+										code: failure
+									});
+								} else {
+									res.send({
+										msg: "SUCESSS",
+										code: success,
+										userId: member._id,
+										isInSession: member.isInSession,
+										userType: member.userType,
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+		}
 	});
 });
 
@@ -166,11 +228,12 @@ router.post(path("/addBankToken"), function(req, res) {
 						error: err,
 						code: failure
 					});
-				}
-				res.send({
+				} else {
+					res.send({
 						msg: "SUCESSS",
 						code: success
 					});
+				}
 			});
 		}
 	});
@@ -292,24 +355,34 @@ router.post(path('/addManyCourses'), function(req, res) {
 
 router.post(path('/login'), function(req, res) {
 	var input = JSON.parse(req.body);
-	var username = input.username;
-	var emailAddress = input.emailAddress;
+	// var username = input.username;
+	// var emailAddress = input.emailAddress;
 	var password = input.password;
 
-	User.findOne({
-		// username: username,
-		"emailAddress": emailAddress,
-	}).exec(function(err, result) {
-		if (err) {
+	var user = String(input.user);
+	var params = {};
+	if (user.indexOf("@") === -1) {
+		params = {
+			'username': user,
+		}
+	} else {
+		params = {
+			'emailAddress': user,
+		}
+	}
+
+	User.findOne(params)
+	.exec(function(err, user) {
+		if (err || !user) {
 			console.log(err);
 			res.send({
 				msg: "FAILURE",
 				code: failure,
 				error: err,
 			});
-		} else if (result) {
+		} else if (user) {
 
-			result.comparePassword(password, function(err, isMatch) {
+			user.comparePassword(password, function(err, isMatch) {
 				if (err || !isMatch) {
 					console.log(err);
 					res.send({
@@ -319,10 +392,11 @@ router.post(path('/login'), function(req, res) {
 					});
 				} else {
 					res.send({
-						msg: "SUCCESS",
-						userId: result._id,
-						isInSession: result.isInSession,
+						msg: "SUCCESS",						
 						code: success,
+						userId: user._id,
+						isInSession: user.isInSession,
+						userType: user.userType,
 					});
 				}
 			});			

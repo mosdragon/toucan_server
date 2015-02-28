@@ -1,6 +1,7 @@
 var mongoose = require("../../db");
 var BankAccount = require("./bankAccount");
 var CreditCard = require("./creditCard");
+var TutorCode = require("./tutorCode");
 
 var reviewSchema = require("./review").schema;
 var baseRate = require("../../config").dev.baseRate;
@@ -37,7 +38,8 @@ var userSchema = new mongoose.Schema({
 	// Only applies to tutors
 	_reviews: {type: [Number], ref: "Reviews", default: []},
 	coursesTaught: {type: [String], required: false, default: []},
-	hourlyRates: {type: String, required: true, default:"{}"},
+	// hourlyRates: {type: String, required: true, default:"{}"},
+	hourlyRates: {type: Object, required: false, default:{}},
 	isCertified: {type: Boolean, default: false},
 	biography: {type: String},
 });
@@ -58,23 +60,50 @@ userSchema.methods.addReview = function(review) {this.reviews.push(review)};
 // 	this.addCourse(coursename, baseRate);
 // };
 
-userSchema.methods.addCourse = function(coursename, rate) {
-	var setRate = rate? rate : baseRate;
-	
-	if (this.coursesTaught.indexOf(coursename) === -1) {
-	    // In the array!
-	    this.coursesTaught.push(coursename);
-	    var hourly = JSON.parse(this.hourlyRates);
-		hourly[coursename] = setRate;
-		this.hourlyRates = JSON.stringify(hourly);
-	}
+
+userSchema.methods.useTutorCode = function(tutorCode, callback) {
+	var self = this;
+	TutorCode.findOne({
+		'tutorCode': tutorCode
+	}, function(err, tutorCode) {
+		if (err || !tutorCode) {
+			console.log("NO TUTOR CODE");
+			var error = err ? err : (new Error("NO TUTOR CODE EXISTS"));
+			console.log(error);
+			return callback(error);
+		} else {
+			self.hourlyRates = tutorCode.rates;
+			self.coursesTaught = tutorCode.coursesTaught;
+			self.isCertified = tutorCode.isCertified;
+			tutorCode.use(function(err) {
+				if (err) {
+					return callback(err);
+				} else {
+					self.save(callback);
+				}
+			});
+		}
+	});
 };
 
-userSchema.methods.addManyCourses = function(courses, rates) {
-	for (var i = 0; i < courses.length; i++) {
-		this.addCourse(courses[i], baseRate);
-	}
-};
+
+// userSchema.methods.addCourse = function(coursename, rate) {
+// 	var setRate = rate? rate : baseRate;
+	
+// 	if (this.coursesTaught.indexOf(coursename) === -1) {
+// 	    // In the array!
+// 	    this.coursesTaught.push(coursename);
+// 	    var hourly = JSON.parse(this.hourlyRates);
+// 		hourly[coursename] = setRate;
+// 		this.hourlyRates = JSON.stringify(hourly);
+// 	}
+// };
+
+// userSchema.methods.addManyCourses = function(courses, rates) {
+// 	for (var i = 0; i < courses.length; i++) {
+// 		this.addCourse(courses[i], baseRate);
+// 	}
+// };
 
 
 userSchema.methods.addBankToken = function(info, callback) {

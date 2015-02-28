@@ -9,7 +9,7 @@ var tutorCodeCollection = "TutorCodes";
 var tutorCodeSchema = new mongoose.Schema({
 	firstName: {type: String, required: true},
 	lastName: {type: String, required: true},
-	emailAddress: {type: String, required: true},
+	emailAddress: {type: String, required: true, unique: true},
 	coursesTaught: {type: [String], required: true},
 	isCertified: {type: Boolean, default: false},
 	rates: {type: Object, required: true},
@@ -19,8 +19,8 @@ var tutorCodeSchema = new mongoose.Schema({
 	dateCreated: {type: Date, default: (new Date())},
 });
 
-tutorCodeSchema.methods.setUsed = function(callback) {
-	console.log("TutorCode setUsed");
+tutorCodeSchema.methods.use = function(callback) {
+	console.log("TutorCode use");
 	var self = this;
 	self.codeUsed = true;
 	self.timeUsed = new Date();
