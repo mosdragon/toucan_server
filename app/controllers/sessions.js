@@ -257,4 +257,156 @@ router.post(path('/selectTutor'), function(req, res) {
 	});
 });
 
+router.post(path('/tuteeBegin'), function(req, res) {
+	var input = JSON.parse(req.body);
+	var sessionId = input.sessionId;
+
+	Session.findOne({
+		_id: sessionId
+	})
+	.exec(function(err, session) {
+		if (err || !session) {
+			console.log(err);
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				err: err,
+				session: session
+			});
+		} else {
+			session.tuteeBegin(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						code: failure,
+						err: err,
+					});
+				} else {
+					res.send({
+						msg: "SUCCESS",
+						code: success,
+						hasBegun: session.hasBegun,
+						tutorTimeBegin: session.tuteeTimeBegin,
+					});
+				}
+			})
+		}
+	});
+});
+
+router.post(path('/tutorBegin'), function(req, res) {
+	var input = JSON.parse(req.body);
+	var sessionId = input.sessionId;
+
+	Session.findOne({
+		_id: sessionId
+	})
+	.exec(function(err, session) {
+		if (err || !session) {
+			console.log(err);
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				err: err,
+				session: session
+			});
+		} else {
+			session.tutorBegin(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						code: failure,
+						err: err,
+					});
+				} else {
+					res.send({
+						msg: "SUCCESS",
+						code: success,
+						hasBegun: session.hasBegun,
+						tutorTimeBegin: session.tutorTimeBegin,
+					});
+				}
+			})
+		}
+	});
+});
+
+router.post(path('/tuteeEnd'), function(req, res) {
+	var input = JSON.parse(req.body);
+	var sessionId = input.sessionId;
+
+	Session.findOne({
+		_id: sessionId
+	})
+	.exec(function(err, session) {
+		if (err || !session) {
+			console.log(err);
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				err: err,
+				session: session
+			});
+		} else {
+			session.tuteeEnd(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						code: failure,
+						err: err,
+					});
+				} else {
+					res.send({
+						msg: "SUCCESS",
+						code: success,
+						hasEnded: session.hasEnded,
+						tutorTimeBegin: session.tuteeTimeEnd,
+					});
+				}
+			})
+		}
+	});
+});
+
+router.post(path('/tutorEnd'), function(req, res) {
+	var input = JSON.parse(req.body);
+	var sessionId = input.sessionId;
+
+	Session.findOne({
+		_id: sessionId
+	})
+	.exec(function(err, session) {
+		if (err || !session) {
+			console.log(err);
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				err: err,
+				session: session
+			});
+		} else {
+			session.tutorEnd(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						code: failure,
+						err: err,
+					});
+				} else {
+					res.send({
+						msg: "SUCCESS",
+						code: success,
+						hasEnded: session.hasEnded,
+						tutorTimeBegin: session.tutorTimeEnd,
+					});
+				}
+			})
+		}
+	});
+});
+
 module.exports = router;
