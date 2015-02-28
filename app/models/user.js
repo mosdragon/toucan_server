@@ -29,6 +29,7 @@ var userSchema = new mongoose.Schema({
 	deleted: {type: Boolean, default: false}, 
 	dateCreated: Date,
 	dateDeleted: {type: Date, required: false, default: null},
+	isInSession: {type: Boolean, default: false},
 
 	// Can be Tutor, Tutee, or both. We just want to have proper documentation added to enable both
 	userType: {type: String, enum: ["TUTOR", "TUTEE", "BOTH"], required: true, default: "TUTEE"},

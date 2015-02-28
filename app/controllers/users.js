@@ -58,6 +58,75 @@ router.post(path('/registerUser'), function(req, res) {
 				msg: "VERIFIED",
 				code: success,
 				userId: member._id,
+				isInSession: member.isInSession,
+			});
+		}
+		// resetCount(member);
+	});
+});
+
+router.post(path('/signupStudent'), function(req, res) {
+	var input = JSON.parse(req.body);
+
+	var firstName = input.firstName;
+	var lastName = input.lastName;
+	var phoneNumber = input.phoneNumber;
+	var username = input.username;
+	var password = input.password;
+	var emailAddress = input.emailAddress;
+	// This will be null at time -> defaults to "TUTEE"
+	var userType = input.userType ? input.userType : "TUTEE";
+
+	var params = {
+		'firstName': firstName,
+		'lastName': lastName,
+		'phoneNumber': phoneNumber,
+		'username': username,
+		'password': password,
+		'emailAddress': emailAddress,
+		'userType': userType,
+	};
+	console.log(params);
+
+	// Card Parameters
+	var stripe_token = input.card_token;
+	// ex: XXX-XXX-XXX-1234. 1234 is the cardNumber number
+	var cardNumber = input.cardNumber;
+	var cardParams = {
+		"stripe_token": stripe_token,
+		"cardNumber": cardNumber,
+	};
+	console.log(cardParams);
+
+	var member = new User(params);
+	// console.log("MEMBER");
+	// console.log(member);
+	member.save(function(err) {
+		if (err) {
+			res.send({
+				msg: "ERRORORR",
+				code: failure,
+			});
+			console.log(err);
+		} else {
+			console.log(member);
+			res.cookie("userId", member._id);
+
+			member.addCardToken(cardParams, function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						error: err,
+						code: failure
+					});
+				}
+				res.send({
+					msg: "SUCESSS",
+					code: success,
+					userId: member._id,
+					isInSession: member.isInSession,
+				});
 			});
 		}
 		// resetCount(member);
@@ -252,6 +321,7 @@ router.post(path('/login'), function(req, res) {
 					res.send({
 						msg: "SUCCESS",
 						userId: result._id,
+						isInSession: result.isInSession,
 						code: success,
 					});
 				}
@@ -461,25 +531,36 @@ router.post(path("/generateTutorCode"), function(req, res) {
 	};
 
 	var tutorCode = new TutorCode(params);
-	tutorCode.generateTutorCode(function(err, code) {
+	tutorCode.save(function(err) {
 		if (err) {
+			console.log(err);
 			res.send({
 				err: err,
 				msg: "FAILURE",
 				code: failure,
 			});
 		} else {
-			res.send({
-				msg: "SUCESSS",
-				code: success,
-				tutorCode: code,
-				emailAddress: emailAddress,
+			tutorCode.generateTutorCode(function(err, code) {
+				if (err) {
+					res.send({
+						err: err,
+						msg: "FAILURE",
+						code: failure,
+					});
+				} else {
+					res.send({
+						msg: "SUCESSS",
+						code: success,
+						tutorCode: code,
+						emailAddress: emailAddress,
+					});
+				}
 			});
 		}
 	});
 });
 
-router.post(path("/checkCodeUnused"), function(req, res) {
+router.post(path("/checkCodeValid"), function(req, res) {
 	var input = JSON.parse(req.body);
 	var tutorCode = input.tutorCode;
 
@@ -492,12 +573,13 @@ router.post(path("/checkCodeUnused"), function(req, res) {
 				err: err,
 				msg: "FAILURE",
 				code: failure,
+				isValid: false,
 			});
 		} else {
 			res.send({
 				msg: "SUCCESS",
 				code: success,
-				codeUsed: code.codeUsed,
+				isValid: !code.codeUsed,
 			});
 		}
 	});
