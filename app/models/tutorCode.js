@@ -27,12 +27,6 @@ tutorCodeSchema.methods.use = function(callback) {
 	self.save(callback);
 };
 
-// var randomValueHex = function(len) {
-//     return crypto.randomBytes(Math.ceil(len / 2))
-//         .toString('hex') // convert to hexadecimal format
-//         .slice(0, len);   // return required number of characters
-// };
-
 var createCode = function(input, digits) {
 	var code = crypto.createHash('sha256').update(String(input)).digest('hex');
 	return code.slice(0, digits);
@@ -42,7 +36,6 @@ tutorCodeSchema.methods.generateTutorCode = function(callback) {
 	// Want 8 digit tutorCodes
 	var self = this;
 	var tutorCodeLen = 6;
-	// self.tutorCode = randomValueHex(tutorCodeLen);
 	self.tutorCode = createCode(self._id, tutorCodeLen);
 	self.save(function(err) {
 		return callback(err, self.tutorCode);

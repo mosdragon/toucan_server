@@ -56,11 +56,6 @@ userSchema.methods.addCreditCards = function(creditCard) {this._creditCards.push
 userSchema.methods.addSession = function(session) {this._sessions.push(session)};
 userSchema.methods.addReview = function(review) {this.reviews.push(review)};
 
-// userSchema.methods.addCourse = function(coursename) {
-// 	this.addCourse(coursename, baseRate);
-// };
-
-
 userSchema.methods.useTutorCode = function(tutorCode, callback) {
 	var self = this;
 	TutorCode.findOne({
@@ -85,26 +80,6 @@ userSchema.methods.useTutorCode = function(tutorCode, callback) {
 		}
 	});
 };
-
-
-// userSchema.methods.addCourse = function(coursename, rate) {
-// 	var setRate = rate? rate : baseRate;
-	
-// 	if (this.coursesTaught.indexOf(coursename) === -1) {
-// 	    // In the array!
-// 	    this.coursesTaught.push(coursename);
-// 	    var hourly = JSON.parse(this.hourlyRates);
-// 		hourly[coursename] = setRate;
-// 		this.hourlyRates = JSON.stringify(hourly);
-// 	}
-// };
-
-// userSchema.methods.addManyCourses = function(courses, rates) {
-// 	for (var i = 0; i < courses.length; i++) {
-// 		this.addCourse(courses[i], baseRate);
-// 	}
-// };
-
 
 userSchema.methods.addBankToken = function(info, callback) {
 	var self = this;

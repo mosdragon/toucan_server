@@ -196,171 +196,13 @@ router.post(path('/signupTutor'), function(req, res) {
 });
 
 
-router.post(path("/addBankToken"), function(req, res) {
-	var input = JSON.parse(req.body);
-	var _id = input.userId;
-	var stripe_token = input.bank_token;
-	var legal_name = input.legal_name;
-	var accountNumber = input.accountNumber; // ex: XXX-XXX-XXX-1234. 1234 is the accountNumber number
-
-	var params = {
-		"_id": _id,
-		"stripe_token": stripe_token,
-		"legal_name": legal_name,
-		"accountNumber": accountNumber,
-	}
-
-	User.findOne({
-		'_id': _id,
-	}).exec(function(err, result) {
-		if (err || !result) {
-			console.log(err);
-			res.send({
-				msg: "ERRORORR",
-				code: failure,
-			});
-		} else {
-			result.addBankToken(params, function(err, result) {
-				if (err) {
-					console.log(err);
-					res.send({
-						msg: "FAILURE",
-						error: err,
-						code: failure
-					});
-				} else {
-					res.send({
-						msg: "SUCESSS",
-						code: success
-					});
-				}
-			});
-		}
-	});
-});
-
-router.post(path("/addCardToken"), function(req, res) {
-	var input = JSON.parse(req.body);
-	var _id = input.userId;
-	var stripe_token = input.card_token;
-	var cardNumber = input.cardNumber; // ex: XXX-XXX-XXX-1234. 1234 is the cardNumber number
-
-	var params = {
-		"_id": _id,
-		"stripe_token": stripe_token,
-		"cardNumber": cardNumber,
-	};
-
-	User.findOne({
-		'_id': _id,
-	}).exec(function(err, result) {
-		if (err || !result) {
-			console.log(err);
-			res.send({
-				msg: "ERRORORR",
-				code: failure,
-			});
-		} else {
-			result.addCardToken(params, function(err, result) {
-				if (err) {
-					console.log(err);
-					res.send({
-						msg: "FAILURE",
-						error: err,
-						code: failure
-					});
-				}
-				res.send({
-					msg: "SUCESSS",
-					code: success
-				});
-			});
-		}
-	});
-});
-
-router.post(path('/addCourse'), function(req, res) {
-
-	var input = JSON.parse(req.body);
-	var course = input['course'];
-	var userId = input.userId;
-
-	User.findOne({
-		'_id': userId,
-	},
-	function(err, user) {
-		if (err || !user) {
-			res.send({
-				message: "FAILURE",
-				code: failure,
-			});
-		} else {
-			user.addCourse(course);
-			user.save(function(err) {
-				if (err) {
-					console.log(err);
-					res.send({
-						message: "FAILURE",
-						code: failure,
-					});
-				} else {
-					res.send({
-						message: "SUCESSS",
-						code: success,
-						data: user,
-					});
-				}
-			})
-		}
-	});
-});
-
-router.post(path('/addManyCourses'), function(req, res) {
-
-	var input = JSON.parse(req.body);
-	var courses = input.courses;
-	var userId = input.userId;
-
-	User.findOne({
-		'_id': userId,
-	},
-	function(err, user) {
-		if (err || !user) {
-			console.log(err);
-			console.log(user)
-			res.send({
-				message: "FAILURE",
-				code: failure,
-			});
-		} else {
-			user.addManyCourses(courses);
-			user.save(function(err) {
-				if (err) {
-					console.log(err);
-					res.send({
-						message: "FAILURE",
-						code: failure,
-					});
-				} else {
-					res.send({
-						message: "SUCESSS",
-						code: success,
-						data: user,
-					});
-				}
-			})
-		}
-	});
-});
-
 router.post(path('/login'), function(req, res) {
 	var input = JSON.parse(req.body);
-	// var username = input.username;
-	// var emailAddress = input.emailAddress;
 	var password = input.password;
 
 	var user = String(input.user);
 	var params = {};
+	// If given email, find by email. Otherwise, by username
 	if (user.indexOf("@") === -1) {
 		params = {
 			'username': user,
@@ -512,8 +354,6 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	        		type: "Point" ,
 	        		coordinates: params.location
 		    	},
-		    	// $maxDistance: <distance in meters>,
-		    	// $minDistance: <distance in meters>
 		    	$maxDistance: milesToMeters(miles), // <distance in meters>
 		  	}
 	    },
@@ -563,16 +403,6 @@ router.post(path("/findActiveTutors"), function(req, res) {
 
 router.post(path("/generateTutorCode"), function(req, res) {
 	var input = JSON.parse(req.body);
-	// firstName: {type:firstName: {type: String, required: true},
-	// lastName: {type: String, required: true},
-	// emailAddress: {type: String, required: true},
-	// coursesTaught: {type: [String], required: true},
-	// isCertified: {type: Boolean, default: false},
-	// rates: {type: Object, required: true},
-	// tutorCode: {type: Number},
-	// codeUsed: {type: Boolean, default: false},
-	// timeUsed: {type: Date},
-	// dateCreated: {type: Date, default: (new Date())},
 
 	var firstName = input.firstName;
 	var lastName = input.lastName;
