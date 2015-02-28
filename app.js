@@ -43,7 +43,7 @@ app.get('/', function(req, res){
   res.render('chat', {});
 });
 
-app.use('/api/v1/', users);
+app.use('/api/v1/users', users);
 app.use('/api/v1/sessions', sessions);
 
 /// catch 404 and forward to error handler

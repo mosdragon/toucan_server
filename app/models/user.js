@@ -41,7 +41,10 @@ var userSchema = new mongoose.Schema({
 	// hourlyRates: {type: String, required: true, default:"{}"},
 	hourlyRates: {type: Object, required: false, default:{}},
 	isCertified: {type: Boolean, default: false},
-	biography: {type: String},
+	biography: {type: String, default: ""},
+	major: {type: String, default: ""},
+	year: {type: String, default: ""},
+	rating: {type: Number, default: -1},
 });
 
 userSchema.plugin(autoIncrement.plugin, {
