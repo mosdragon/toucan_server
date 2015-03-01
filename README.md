@@ -1,10 +1,10 @@
-#Toucan Tutoring Documentation
+#Toucan Tutoring API Docs
 
 ``` javascript
+	// Domain name may change later. But for now, we'll stick
+	// with this
 	domain = "beta-toucanapp.rhcloud.com"
 	baseurl = domain + "api/v1/"
-	// base url's domain name may change later. But for now, we'll stick
-	// with this
 ```
 ####Globals Variables
 The following are used throughout the application, and they follow the same
@@ -141,6 +141,7 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/users_
 				}
 				// More here
 		}
+	```
 
 + ####response
 	+ msg
@@ -180,13 +181,13 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 	+ coursesFound __(Boolean)__
 	+ courseData
 
-	<pre>
+	``` javascript
 		// Example
 		courseData = [
 		["SPAN 1001", "University of Georgia(UGA)"],
 		["PSYC 2001", "University of Georgia(UGA)"],
 		];
-	</pre>
+	```
 
 ###/activeTutor
 + ####params
@@ -213,7 +214,7 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 	+ code
 	+ foundTutors __(Boolean)__
 	+ tutors
-	<pre>
+	``` javascript
 		// Example
 		tutors = [
 			{
@@ -232,23 +233,23 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 			},
 			// More results
 		]
-	</pre>
+	```
 
 ###/selectTutor
-	+ ####params
-		+ tutorId
-		+ userId
-		+ course
-		+ studentPhone __(String - phone number)__
++ ####params
+	+ tutorId
+	+ userId
+	+ course
+	+ studentPhone __(String - phone number)__
 
-	+ ####response
-		+ msg
-		+ code
-		+ tutorPhone __(String)__
-		+ tutorName
-		+ sessionId __(String)__
-		+ course
-		+ rate __(Float)__
++ ####response
+	+ msg
+	+ code
+	+ tutorPhone __(String)__
+	+ tutorName
+	+ sessionId __(String)__
+	+ course
+	+ rate __(Float)__
 
 ###/tuteeBegin, /tutorBegin
 __Note:__ These are two separate endpoints. They behave the exact same way
@@ -282,8 +283,8 @@ on the client-side.
 	+ userId
 	+ sessionId
 	+ rating __(Float - 1 - 5, increments of 0.5)__
-	+ title __ [OPTIONAL] (String - just the title of the review)__
-	+ details __[OPTIONAL] (String - the actual review)__
+	+ title __\[OPTIONAL\] (String - just the title of the review)__
+	+ details __\[OPTIONAL\] (String - the actual review)__
 
 
 + ####response
