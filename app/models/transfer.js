@@ -6,12 +6,10 @@ autoIncrement.initialize(mongoose);
 
 var transfersSchema = new mongoose.Schema({
 	currency: {type: String, default: "usd"},
-	amount: Number, // amount in cents, by Stripe api
-	stripe_recipient: {type: Number, required: true},
+	amount: Number,
 	dateCreated: {type: Date, default: new Date()},
   	_recipient: {type: Number, ref:"User", required: true},
-  	bank_account: String,
-  	statement_descriptor: String,
+  	description: String,
   	transfer_obj: Object,
 });
 
@@ -20,6 +18,9 @@ transfersSchema.plugin(autoIncrement.plugin, {
 	startAt: 69711,
 	incrementBy: (7 *13 * 21),
 });
+
+
+module.exports = mongoose.model(transfersCollection, transfersSchema);
 
 //   // Create a transfer to the specified recipient
 // stripe.transfers.create({

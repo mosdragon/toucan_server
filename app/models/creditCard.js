@@ -1,23 +1,8 @@
 var mongoose = require("../../db");
 var creditCardCollection = "CreditCards";
-var chargesCollection = "Charges";
 
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
-
-var chargesSchema = new mongoose.Schema({
-	currency: {type: String, default: "usd"},
-	amount: Number,
-	description: String,
-	dateCreated: {type: Date, default: new Date()},
-});
-
-chargesSchema.plugin(autoIncrement.plugin, {
-	model: chargesCollection,
-	startAt: 674339,
-	incrementBy: (207 * 83 * 97),
-});
-
 
 
 var creditCardSchema = new mongoose.Schema({
@@ -35,8 +20,11 @@ creditCardSchema.plugin(autoIncrement.plugin, {
 	incrementBy: (13 * 403 * 17),
 });
 
-creditCardSchema.methods.addCharge = function(charge) {
-	this._charges.push(charge)
+creditCardSchema.methods.addCharge = function(charge, callback) {
+	var self = this;
+	self._charges.push(charge._id);
+	self.save(callback);
+
 };
 
 creditCardSchema.methods.setCardNumber = function(card) {

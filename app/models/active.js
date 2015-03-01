@@ -39,16 +39,11 @@ activeSchema.pre('save', function(next) {
     var self = this;
 
     // next();
-    if (self['endTime'] == null) {
+    if (self['endTime'] == undefined) {
     	var now = new Date();
     	// One hour from now
     	now.setHours(now.getHours() + 1);
 	    self.setStripeId();
-	    // User.findOne({_id: self._tutor}, function(err, user) {
-	    // 	console.log(user);
-	    // 	self.coursesTaught = user.coursesTaught;
-	    // 	return next();
-	    // });
 		next();
 
 	} else {

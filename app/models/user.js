@@ -65,9 +65,7 @@ userSchema.methods.useTutorCode = function(tutorCode, callback) {
 		'tutorCode': tutorCode
 	}, function(err, tutorCode) {
 		if (err || !tutorCode) {
-			console.log("NO TUTOR CODE");
 			var error = err ? err : (new Error("NO TUTOR CODE EXISTS"));
-			console.log(error);
 			return callback(error);
 		} else {
 			self.hourlyRates = tutorCode.rates;

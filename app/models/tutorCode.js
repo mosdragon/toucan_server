@@ -20,7 +20,6 @@ var tutorCodeSchema = new mongoose.Schema({
 });
 
 tutorCodeSchema.methods.use = function(callback) {
-	console.log("TutorCode use");
 	var self = this;
 	self.codeUsed = true;
 	self.timeUsed = new Date();

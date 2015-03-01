@@ -40,7 +40,6 @@ router.post(path('/signupStudent'), function(req, res) {
 		'emailAddress': emailAddress,
 		'userType': userType,
 	};
-	console.log(userParams);
 
 	// Card Parameters
 	var stripe_token = input.card_token;
@@ -50,7 +49,6 @@ router.post(path('/signupStudent'), function(req, res) {
 		"stripe_token": stripe_token,
 		"cardNumber": cardNumber,
 	};
-	console.log(cardParams);
 
 	var member = new User(userParams);
 
@@ -62,7 +60,6 @@ router.post(path('/signupStudent'), function(req, res) {
 			});
 			console.log(err);
 		} else {
-			console.log(member);
 			res.cookie("userId", member._id);
 
 			member.addCardToken(cardParams, function(err) {
@@ -111,7 +108,6 @@ router.post(path('/signupTutor'), function(req, res) {
 		'emailAddress': emailAddress,
 		'userType': userType,
 	};
-	console.log(userParams);
 
 	// Card Parameters
 	var card_token = input.card_token;
@@ -121,7 +117,6 @@ router.post(path('/signupTutor'), function(req, res) {
 		"stripe_token": card_token,
 		"cardNumber": cardNumber,
 	};
-	console.log(cardParams);
 
 	// Bank Parameters
 	var bank_token = input.bank_token;
@@ -134,11 +129,8 @@ router.post(path('/signupTutor'), function(req, res) {
 		"legal_name": legal_name,
 		"accountNumber": accountNumber,
 	};
-	console.log(bankParams);
 
 	var member = new User(userParams);
-	// console.log("MEMBER");
-	// console.log(member);
 	member.save(function(err) {
 		if (err) {
 			res.send({
@@ -148,7 +140,6 @@ router.post(path('/signupTutor'), function(req, res) {
 			});
 			console.log(err);
 		} else {
-			console.log(member);
 			res.cookie("userId", member._id);
 
 			member.addCardToken(cardParams, function(err) {
@@ -171,7 +162,7 @@ router.post(path('/signupTutor'), function(req, res) {
 						} else {
 							member.useTutorCode(tutorCode, function(err) {
 								if (err) {
-									// console.log(err);
+									console.log(err);
 									res.send({
 										msg: "FAILURE",
 										error: err.mesage,
@@ -274,7 +265,6 @@ router.post(path("/generateTutorCode"), function(req, res) {
 	}
 
 	console.log("Ensured all courses have rates");
-	console.log(rates);
 
 	var params = {
 		firstName : firstName,

@@ -25,8 +25,10 @@ bankAccountSchema.methods.setAccountNumber = function(account) {
 	this.accountNumber += String(account);
 }
 
-bankAccountSchema.methods.addTransfer = function(transfer) {
-	this._transfers.push(transfer)
+bankAccountSchema.methods.addTransfer = function(transfer, callback) {
+	var self = this;
+	self._transfers.push(transfer._id);
+	self.save(callback);
 };
 
 module.exports = mongoose.model(bankAccountCollection, bankAccountSchema);

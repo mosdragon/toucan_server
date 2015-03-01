@@ -13,10 +13,12 @@ var data = {
 	dev: {
 		mongo:  mongodb_connection_string,
 		// Stripe demo key
-		stripeApi: "sk_test_BQokikJOvBiI2HlWgH4olfQ2",
+		stripe_api_key: "sk_test_4dRYACzSml2igCRyOvb0d8Xw",
 		cookiePassword: "insertpasswordhere",
 		baseRate: 8,
 		baseRateCertified: 18,
+		toucan_bank_id: "rp_15bKjgHnsjstms08sHgByby6",
+		percentTutor: 80,
 	}
 };
 

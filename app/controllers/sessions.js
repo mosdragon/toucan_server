@@ -46,13 +46,10 @@ router.post(path("/activeTutor"), function(req, res) {
 				error: err,
 			});
 		} else {
-			console.log("USER FOUND");
 			params._tutor = user._id;
 			params.coursesTaught = user.coursesTaught;
 			Active.findOne({_tutor: user._id}, function(err, active) {
 				if (err || !active) {
-					console.log(err);
-					console.log(active);
 					// No active exists for this person. Create a new one.
 					var active = new Active(params);
 					active.save(function(err) {
@@ -194,8 +191,6 @@ router.post(path('/selectTutor'), function(req, res) {
 				code: failure,
 			});
 		} else if(active && !active.available) {
-			console.log("tutor availability");
-			console.log(active.available);
 			console.log("Tutor not available");
 			res.send({
 				msg: "It looks like this tutor is no longer available. Please try another tutor.",
