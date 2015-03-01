@@ -9,7 +9,15 @@ var chargesSchema = new mongoose.Schema({
 	amount: {type: Number, required: true},
 	description: {type: String, default:""},
 	dateCreated: {type: Date, default: new Date()},
+	_sessions: {type: [Number], ref: "Sessions", default: []},
+	charge_object: {type: Object},
 });
+
+chargesSchema.methods.addSession = function(session, callback) {
+	var self = this;
+	this._sessions.push(session._id);
+	self.save(callback);
+}
 
 chargesSchema.plugin(autoIncrement.plugin, {
 	model: chargesCollection,

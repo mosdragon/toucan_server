@@ -4,6 +4,25 @@ var sessionCollection = "Session";
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
 
+// Useful for Scheduling transfers for later
+var schedule = require('node-schedule');
+var twoDaysLater = function(input) {
+	// input.setDate(input.getDate() + 2);
+	// input.setHours(input.getHours() + 2);
+
+	// Temporarily do it after 5 seconds
+	input.setSeconds(input.getSeconds() + 5);
+	return input;
+};
+
+var minuteLater = function(input) {
+	// input.setMinutes(input.getMinutes() + 1);
+
+	// Temporarily do it after 5 seconds
+	input.setSeconds(input.getSeconds() + 5);
+	return input;
+};
+
 var stripe_api_key = require("../../config").dev.stripe_api_key;
 var stripe = require("stripe")(stripe_api_key);
 
@@ -117,8 +136,8 @@ sessionSchema.methods.endAppointment = function(callback) {
 	}
 
 	totalHours += fullHours;
-	if (totalHours < 0.5) {
-		totalHours = 0.5;
+	if (totalHours < 0.75) {
+		totalHours = 0.75;
 	}
 	console.log("Total Hours: " + totalHours);
 
@@ -129,12 +148,24 @@ sessionSchema.methods.endAppointment = function(callback) {
 	console.log(amountDue);
 	self.totalCost = amountDue;
 
-	self.chargeStudent(callback);
+	self.save(function(err) {
+
+		var date = twoDaysLater(new Date());
+		var job = schedule.scheduleJob(date, chargeStudent
+			.bind(null, self, function(err) {
+				console.log("ChargeStudent complete");
+				if (err) {
+					console.log(err);
+				}
+			})
+		);
+		return callback(err);
+	});
+	
 };
 
-sessionSchema.methods.chargeStudent = function(callback) {
-	console.log("~~~~~~~~~~~~~~~~chargeStudent called");
-	var self = this;
+var chargeStudent = function(session, callback) {
+	var self = session;
 
 	var amount = self.totalCost;
 	if (amount > 0.50) {
@@ -153,28 +184,37 @@ sessionSchema.methods.chargeStudent = function(callback) {
 				// Send an email to student if charge successful. Use temp email.
 				studentEmail = "ospsn101@gmail.com";
 
+				var pennies = amount * 100;
+				var dollars = Math.floor(pennies / 100);
+				var cents = Math.floor(pennies % 100);
+
+				var now = new Date();
+				// Month + 1 because months start at 0 for some reason.
+				var dateString = (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear();
+				var description = "Toucan Tutoring session lasting " + self.hoursOfService +
+					" hour(s) at a rate of $" +  self.hourlyRate + "/hour on " + dateString
+					+ ". Total Cost: $" + dollars + "." + cents + ".";
+
 
 				stripe.charges.create({
-					"amount": amount * 100,
+					"amount": pennies,
 					"currency": "usd",
 					"customer": customerId,
-				}, function(err, charge) {
+					"description": description,
+				}, function(err, charge_object) {
 					if (err) {
 						// The card has been declined;
-						console.log('CHARGE DELINED');
 						console.log(err);
 						return callback(err);
 					} else {
-						console.log("CHARGE CREATED");
-						var description = "Tutoring session lasting " + self.hoursOfService +
-							" hours at a rate of " +  self.hourlyRate + ". Total Cost: $" + amount;
 						var chargeParams = {
 							'currency': "usd",
 							'amount': amount,
 							'description': description,
+							"charge_object": charge_object,
 						}
 						var charge = new Charge(chargeParams);
-						charge.save(function(err) {
+						charge.addSession(self, function(err) {
 							if (err) {
 								callback(err);
 							} else {
@@ -188,7 +228,16 @@ sessionSchema.methods.chargeStudent = function(callback) {
 												console.log(err);
 												return callback(err);
 											} else {
-												self.payTutor(callback);
+												var date = twoDaysLater(new Date());
+												var job = schedule.scheduleJob(date, payTutor
+													.bind(null, self, function(err) {
+														console.log("Bank Transfer Complete")
+														if (err) {
+															console.log(err);
+														}
+													})
+												);
+												return callback(err);
 											}
 										});
 									}
@@ -204,11 +253,10 @@ sessionSchema.methods.chargeStudent = function(callback) {
 	}
 };
 
-sessionSchema.methods.payTutor = function(callback) {
-	var self = this;
+var payTutor = function(session, callback) {
+	console.log("ASYNC Pay Tutor");
+	var self = session;
 	var amount = self.totalCost;
-
-	console.log("~~~~~~payTutor");
 
 	BankAccount.findOne({
 		"_user": self._tutor
@@ -222,13 +270,16 @@ sessionSchema.methods.payTutor = function(callback) {
 			// Create a transfer to the specified recipient
 			var recipientId = account.stripe_id;
 			var pennies = Math.floor(amount * 100 * percentTutor);
+
+			var dollars = Math.floor(pennies / 100);
+			var cents = Math.floor(pennies % 100);
+
+			var now = new Date();
+			// Month + 1 because months start at 0 for some reason.
+			var dateString = (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear();
 			var description = "Payment by Toucan Tutoring for teaching " + self.course +
-				". Compsensation of $" + pennies/100 + ".";
+				" on "  + dateString + ". Compsensation of $" + dollars + "." + cents + ".";
 
-			console.log(description);
-
-			console.log("PAYMENT RECEIEVED: " + amount * 100);
-			console.log("PAYMENT SENDING: " + pennies);
 			var bank_account_id = account.stripe_token.active_account.id;
 
 			stripe.transfers.create({
@@ -237,12 +288,13 @@ sessionSchema.methods.payTutor = function(callback) {
 				"recipient": recipientId,
 				"bank_account": bank_account_id,
 				"statement_descriptor": description,
+				"description": description,
+
 			}, function(err, transfer_obj) {
 				if (err || !transfer_obj) {
 					console.log(err);
 					return callback(err);
 				} else {
- 					console.log("Transfer Created");
 					var transferParams = {
 						'currency': "usd",
 						'amount': amount,
@@ -251,7 +303,76 @@ sessionSchema.methods.payTutor = function(callback) {
 						"transfer_obj": transfer_obj,
 					};
 					var transfer = new Transfer(transferParams);
-					console.log(transfer);
+					transfer.addSession(session, function(err) {
+						if (err) {
+							callback(err);
+						} else {
+							console.log("Transfer SAVED");
+							account.addTransfer(transfer, function(err) {
+								if (err) {
+									callback(err);
+								} else {
+									self.save(callback);
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	});
+};
+
+var payToucan = function(session, callback) {
+	console.log("ASYNC Pay Tutor");
+	var self = session;
+	var amount = self.totalCost;
+
+	BankAccount.findOne({
+		"_user": self._tutor
+	})
+	.exec(function(err, account) {
+		if (err || !account) {
+			console.log(err);
+			return callback(err);
+		} else {
+			console.log("Found Bank Account");
+			// Create a transfer to the specified recipient
+			var recipientId = account.stripe_id;
+			var pennies = Math.floor(amount * 100 * percentTutor);
+
+			var dollars = Math.floor(pennies / 100);
+			var cents = Math.floor(pennies % 100);
+
+			var now = new Date();
+			// Month + 1 because months start at 0 for some reason.
+			var dateString = (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear();
+			var description = "Payment by Toucan Tutoring for teaching " + self.course +
+				" on "  + dateString + ". Compsensation of $" + dollars + "." + cents + ".";
+
+			var bank_account_id = account.stripe_token.active_account.id;
+
+			stripe.transfers.create({
+				"amount": pennies,
+				"currency": "usd",
+				"recipient": recipientId,
+				"bank_account": bank_account_id,
+				"statement_descriptor": description,
+				"description": description,
+
+			}, function(err, transfer_obj) {
+				if (err || !transfer_obj) {
+					console.log(err);
+					return callback(err);
+				} else {
+					var transferParams = {
+						'currency': "usd",
+						'amount': amount,
+						'description': description,
+						"_recipient": self._tutor,
+						"transfer_obj": transfer_obj,
+					};
+					var transfer = new Transfer(transferParams);
 					transfer.save(function(err) {
 						if (err) {
 							callback(err);

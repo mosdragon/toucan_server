@@ -11,7 +11,14 @@ var transfersSchema = new mongoose.Schema({
   	_recipient: {type: Number, ref:"User", required: true},
   	description: String,
   	transfer_obj: Object,
+  	_sessions: {type: [Number], ref: "Sessions", default: []},
 });
+
+transfersSchema.methods.addSession = function(session, callback) {
+	var self = this;
+	this._sessions.push(session._id);
+	self.save(callback);
+};
 
 transfersSchema.plugin(autoIncrement.plugin, {
 	model: transfersCollection,
