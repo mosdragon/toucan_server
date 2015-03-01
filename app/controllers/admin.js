@@ -99,6 +99,8 @@ router.post(path("/generateTutorCode"), function(req, res) {
 				err: err,
 				msg: failureMsg,
 				code: failure,
+				tutorCode: "",
+				emailAddress: "",
 			});
 		} else {
 			tutorCode.generateTutorCode(function(err, code) {

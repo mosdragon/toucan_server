@@ -92,12 +92,12 @@ router.post(path("/activeTutor"), function(req, res) {
 	var input = JSON.parse(req.body);
 	var userId = input.userId;
 
-	var beginTime = input.beginTime ? input.beginTime : new Date();
+	var beginTime = input.beginTime ? new Date(input.beginTime) : new Date();
 
 	var hourLater = new Date(beginTime);
 	hourLater.setHours(hourLater.getHours() + 1);
 
-	var endTime = input.endTime ? input.endTime : hourLater;
+	var endTime = input.endTime ? new Date(input.endTime) : hourLater;
 	var latitude = input.latitude;
 	var longitude = input.longitude;
 
@@ -367,7 +367,6 @@ router.post(path('/tuteeBegin'), function(req, res) {
 						msg: successMsg,
 						code: success,
 						hasBegun: session.hasBegun,
-						tutorTimeBegin: session.tuteeTimeBegin,
 					});
 				}
 			})
@@ -405,7 +404,6 @@ router.post(path('/tutorBegin'), function(req, res) {
 						msg: successMsg,
 						code: success,
 						hasBegun: session.hasBegun,
-						tutorTimeBegin: session.tutorTimeBegin,
 					});
 				}
 			})
@@ -443,7 +441,6 @@ router.post(path('/tuteeEnd'), function(req, res) {
 						msg: successMsg,
 						code: success,
 						hasEnded: session.hasEnded,
-						tutorTimeBegin: session.tuteeTimeEnd,
 					});
 				}
 			})
@@ -481,7 +478,6 @@ router.post(path('/tutorEnd'), function(req, res) {
 						msg: successMsg,
 						code: success,
 						hasEnded: session.hasEnded,
-						tutorTimeBegin: session.tutorTimeEnd,
 					});
 				}
 			})

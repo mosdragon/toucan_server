@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://localhost:5000/ -->
+<html lang="en" class=""><script type="text/javascript">Object.defineProperty(window.navigator, 'userAgent', { get: function(){ return 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2114.2 Safari/537.36'; } });Object.defineProperty(window.navigator, 'vendor', { get: function(){ return ''; } });Object.defineProperty(window.navigator, 'platform', { get: function(){ return 'Windows'; } });</script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>APIDOCS.md - Grip</title>
+  <link rel="icon" href="http://localhost:5000/grip-static/favicon.ico"><link rel="stylesheet" href="http://localhost:5000/grip-cache/github2-8f9492ba1b29d6e5b41cd7e06e0e88a5b1c8ae107269e75f5ca3bbba8afc5a3f.css">
+  <link rel="stylesheet" href="http://localhost:5000/grip-cache/github-84e4144e3c0347e1187b021a88b6bcbad5186ac898c63e26b13332c7c53504a6.css">
+  <style>
+    /* Page tweaks */
+    .preview-page {
+      margin-top: 64px;
+    }
+    /* Discussion tweaks */
+    .discussion-timeline.wide {
+      width: 920px;
+    }
+    .timeline-comment-wrapper > .timeline-comment:after,
+    .timeline-comment-wrapper > .timeline-comment:before {
+      content: none;
+    }
+  </style>
+<style type="text/css">.fancybox-margin{margin-right:15px;}</style></head>
+<body>
+  <div class="page">
+    <div class="preview-page">
+    <div class="container">
+      <div class="repository-with-sidebar repo-container with-full-navigation">
+
+        
+          <div class="repository-content context-loader-container">
+            <div id="readme" class="boxed-group flush clearfix announce instapaper_body md">
+              
+                <h3>
+                  <span class="octicon octicon-book"></span>
+                  APIDOCS.md
+                </h3>
+              
+              <div class="markdown-body entry-content">
+                <h1>
+<a id="user-content-toucan-tutoring-documentation" class="anchor" href="http://localhost:5000/#toucan-tutoring-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Toucan Tutoring Documentation</h1>
+
+<div class="highlight highlight-javascript"><div class="top-box hide"><div class="alert-info"></div></div><pre data-original-code="    domain = &quot;beta-toucanapp.rhcloud.com&quot;
+    baseurl = domain + &quot;api/v1/&quot;
+    // base url&#39;s domain name may change later. But for now, we&#39;ll stick
+    // with this" data-snippet-id="ext.fdf248316d4edc748a75d77cc3366307" data-snippet-saved="false" data-codota-status="done">    domain <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>beta-toucanapp.rhcloud.com<span class="pl-pds">"</span></span>
+    baseurl <span class="pl-k">=</span> domain <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">"</span>api/v1/<span class="pl-pds">"</span></span>
+    <span class="pl-c">// base url's domain name may change later. But for now, we'll stick</span>
+    <span class="pl-c">// with this</span></pre></div>
+
+<h4>
+<a id="user-content-globals-variables" class="anchor" href="http://localhost:5000/#globals-variables" aria-hidden="true"><span class="octicon octicon-link"></span></a>Globals Variables</h4>
+
+<p>The following are used throughout the application, and they follow the same
+consistent format every time, whether they are request parameters or
+response variables:</p>
+
+<ul>
+<li>msg <strong>(String - "SUCCESS" or "FAILURE")</strong>
+</li>
+<li>code <strong>(Integer - 200 for "SUCCESS", 500 for "FAILURE")</strong>
+</li>
+<li>userId <strong>(Integer -- identifier for the user -- store this locally
+during login/signup)</strong>
+</li>
+<li>tutorId <strong>(Integer -- identifier for a selected tutor)</strong>
+</li>
+<li>latitude <strong>(Double)</strong>
+</li>
+<li>longitude <strong>(Double)</strong>
+</li>
+<li>course <strong>(String)</strong>
+</li>
+<li>school <strong>(String)</strong>
+</li>
+<li>userType <strong>("TUTEE", "TUTOR", or "BOTH")</strong>
+</li>
+</ul>
+
+<p><strong>Assume everything asked for as a param is a string unless otherwise stated</strong></p>
+
+<p><strong>Any param prefixed with "is" will be a Boolean. (Ex: isValid, isInSession)</strong></p>
+
+<h2>
+<a id="user-content-admin" class="anchor" href="http://localhost:5000/#admin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Admin</h2>
+
+<p><strong>All endpoints here must look like this:</strong> <em>&lt;baseurl&gt;+/admin</em></p>
+
+<p><strong>Note:</strong> These endpoints are NOT for the Android app. These
+will exclusively be for the admin team to add tutors and available
+courses/schools.</p>
+
+<h3>
+<a id="user-content-addcourse" class="anchor" href="http://localhost:5000/#addcourse" aria-hidden="true"><span class="octicon octicon-link"></span></a>/addCourse</h3>
+
+<ul>
+<li>
+<h4>
+<a id="user-content-params" class="anchor" href="http://localhost:5000/#params" aria-hidden="true"><span class="octicon octicon-link"></span></a>params</h4>
+
+<ul>
+<li>latitude</li>
+<li>longitude</li>
+<li>course</li>
+<li>school</li>
+</ul>
+</li>
+<li>
+<h4>
+<a id="user-content-response" class="anchor" href="http://localhost:5000/#response" aria-hidden="true"><span class="octicon octicon-link"></span></a>response</h4>
+
+<ul>
+<li>msg</li>
+<li>code</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="user-content-generatetutorcode" class="anchor" href="http://localhost:5000/#generatetutorcode" aria-hidden="true"><span class="octicon octicon-link"></span></a>/generateTutorCode</h3>
+
+<ul>
+<li>
+<h4>
+<a id="user-content-params-1" class="anchor" href="http://localhost:5000/#params-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>params</h4>
+
+<ul>
+<li>firstName</li>
+<li>lastName</li>
+<li>isCertified</li>
+<li>coursesTaught</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Example</span>
+[course1, course2, course3]
+</pre></div>
+
+<ul>
+<li>rates</li>
+</ul>
+
+<pre lang="javscript"><code>// Example
+{ "course1": rate1, "course2": rate2}
+
+</code></pre>
+</li>
+<li>
+<h4>
+<a id="user-content-response-1" class="anchor" href="http://localhost:5000/#response-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>response</h4>
+
+<ul>
+<li>msg</li>
+<li>code</li>
+<li>tutorCode</li>
+<li>emailAddress</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="user-content-registration" class="anchor" href="http://localhost:5000/#registration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Registration</h2>
+
+<p><strong>All endpoints here must look like this:</strong> <em>&lt;baseurl&gt;+/users</em></p>
+
+<h3>
+<a id="user-content-checkcodevalid" class="anchor" href="http://localhost:5000/#checkcodevalid" aria-hidden="true"><span class="octicon octicon-link"></span></a>/checkCodeValid</h3>
+
+<ul>
+<li>
+<h4>
+<a id="user-content-params-2" class="anchor" href="http://localhost:5000/#params-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>params</h4>
+
+<ul>
+<li>tutorCode</li>
+</ul>
+</li>
+<li>
+<h4>
+<a id="user-content-response-2" class="anchor" href="http://localhost:5000/#response-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>response</h4>
+
+<ul>
+<li>msg</li>
+<li>code</li>
+<li>isValid</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="user-content-signupstudent" class="anchor" href="http://localhost:5000/#signupstudent" aria-hidden="true"><span class="octicon octicon-link"></span></a>/signupStudent</h3>
+
+<ul>
+<li>
+<h4>
+<a id="user-content-params-3" class="anchor" href="http://localhost:5000/#params-3" aria-hidden="true"><span class="octicon octicon-link"></span></a>params</h4>
+
+<ul>
+<li>firstName</li>
+<li>lastName</li>
+<li>username</li>
+<li>emailAddress</li>
+<li>password <strong>(String)</strong>
+</li>
+<li>phoneNumber <strong>(String)</strong>
+</li>
+<li>cardNumer <strong>(String -- only the last 4 digits)</strong>
+</li>
+<li>card_token</li>
+</ul>
+
+<div class="highlight highlight-javascript"><div class="top-box hide"><div class="alert-info"></div></div><pre data-original-code="    // Token given by Stripe during registration
+    // Example:
+    token = {
+            id: &quot;cus_038iviu9hff24f&quot;,
+            // More here
+    }" data-snippet-id="ext.f7214d616c4704160fa1a8318151ac5b" data-snippet-saved="false" data-codota-status="done">    <span class="pl-c">// Token given by Stripe during registration</span>
+    <span class="pl-c">// Example:</span>
+    token <span class="pl-k">=</span> {
+            id<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>cus_038iviu9hff24f<span class="pl-pds">"</span></span>,
+            <span class="pl-c">// More here</span>
+    }</pre></div>
+</li>
+<li>
+<h4>
+<a id="user-content-response-3" class="anchor" href="http://localhost:5000/#response-3" aria-hidden="true"><span class="octicon octicon-link"></span></a>response</h4>
+
+<ul>
+<li>msg</li>
+<li>code</li>
+<li>userId</li>
+<li>isInSession</li>
+<li>userType</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="user-content-signuptutor" class="anchor" href="http://localhost:5000/#signuptutor" aria-hidden="true"><span class="octicon octicon-link"></span></a>/signupTutor</h3>
+
+<ul>
+<li>
+<h4>
+<a id="user-content-params-4" class="anchor" href="http://localhost:5000/#params-4" aria-hidden="true"><span class="octicon octicon-link"></span></a>params</h4>
+
+<ul>
+<li>firstName</li>
+<li>lastName</li>
+<li>username</li>
+<li>emailAddress</li>
+<li>password <strong>(String)</strong>
+</li>
+<li>phoneNumber <strong>(String)</strong>
+</li>
+<li>cardNumer <strong>(String -- only the last 4 digits)</strong>
+</li>
+<li>card_token</li>
+</ul>
+
+<div class="highlight highlight-javascript"><div class="top-box hide"><div class="alert-info"></div></div><pre data-original-code="    // Token given by Stripe during registration
+    // Example:
+    card_token = {
+            id: &quot;cus_038iviu9hff24f&quot;,
+            // More here
+    }" data-snippet-id="ext.6714b3b04382019da2dd69c040db657e" data-snippet-saved="false" data-codota-status="done">    <span class="pl-c">// Token given by Stripe during registration</span>
+    <span class="pl-c">// Example:</span>
+    card_token <span class="pl-k">=</span> {
+            id<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>cus_038iviu9hff24f<span class="pl-pds">"</span></span>,
+            <span class="pl-c">// More here</span>
+    }</pre></div>
+
+<ul>
+<li>legal_name <strong>(Full legal name of account holder)</strong>
+</li>
+<li>accountNumber <strong>(String -- only the last 4 digits)</strong>
+</li>
+<li>bank_token</li>
+</ul>
+
+<div class="highlight highlight-javascript"><div class="top-box hide"><div class="alert-info"></div></div><pre data-original-code="    // Token given by Stripe during registration
+    // Example:
+    bank_token = {
+            id: &quot;rp_038iviu9hff24f&quot;,
+            active_account : {
+                id: &quot;ba_foie32oidn2f&quot;,
+            }
+            // More here
+    }
+
++ ####response
++ msg
++ code
++ userId
++ isInSession
++ userType
+
+###/login
++ ####params
++ user __(Can be username or emailAddress)__
++ password
+
+
++ ####response
++ msg
++ code
++ userId
++ isInSession
++ userType
+
+
+
+##Sessions
+__All endpoints here must look like this:__ _&amp;lt;baseurl&amp;gt;+/sessions/_
+
+
+###/getCourses
++ ####params
++ latitude
++ longitude
+
+
++ ####response
++ msg
++ code
++ coursesFound __(Boolean)__
++ courseData
+
+&lt;pre&gt;
+    // Example
+    courseData = [
+    [&quot;SPAN 1001&quot;, &quot;University of Georgia(UGA)&quot;],
+    [&quot;PSYC 2001&quot;, &quot;University of Georgia(UGA)&quot;],
+    ];
+&lt;/pre&gt;
+
+###/activeTutor
++ ####params
++ latitude
++ longitude
++ userId
++ endTime __(Long time Milliseconds)__
+
++ ####response
++ msg
++ code
+
+###/findActiveTutors
++ ####params
++ latitude
++ longitude
++ userId
++ course
++ miles __\[OPTIONAL\] (Integer -&gt; max distance to search by. Defaults to 3)__
++ endTime __(Long -&gt; time in Milliseconds)__
+
++ ####response
++ msg
++ code
++ foundTutors __(Boolean)__
++ tutors
+&lt;pre&gt;
+    // Example
+    tutors = [
+        {
+            &quot;name&quot;: &quot;John Cena&quot;,
+            &quot;tutorId&quot;: 903778,
+            &quot;isCertified&quot;: true,
+            &quot;tutorPhone&quot;: &quot;6783219900&quot;,
+            &quot;course&quot;: &quot;PORT 2001&quot;,
+            &quot;rate&quot;: 8,
+            &quot;biography&quot;: &quot;&quot;,
+            &quot;major&quot;: &quot;&quot;,
+            &quot;year&quot;: &quot;&quot;,
+            &quot;experience&quot;: 0,
+            &quot;reviews&quot;: [ ],
+            &quot;rating&quot;: 0
+        },
+        // More results
+    ]
+&lt;/pre&gt;
+
+###/selectTutor
++ ####params
+    + tutorId
+    + userId
+    + course
+    + studentPhone __(String - phone number)__
+
++ ####response
+    + msg
+    + code
+    + tutorPhone __(String)__
+    + tutorName
+    + sessionId __(String)__
+    + course
+    + rate __(Float)__
+
+###/tuteeBegin, /tutorBegin
+__Note:__ These are two separate endpoints. They behave the exact same way
+on the client-side.
++ ####params
++ userId
++ sessionId
+
++ ####response
++ msg
++ code
++ hasBegun __(Boolean)__
+
+
+###/tuteeEnd, /tutorEnd
+__Note:__ These are two separate endpoints. They behave the exact same way
+on the client-side.
++ ####params
++ userId
++ sessionId
+
+
++ ####response
++ msg
++ code
++ hasEnded __(Boolean)__
+
+
+###/review
++ ####params
++ userId
++ sessionId
++ rating __(Float - 1 - 5, increments of 0.5)__
++ title __ [OPTIONAL] (String - just the title of the review)__
++ details __[OPTIONAL] (String - the actual review)__
+
+
++ ####response
++ msg
++ code" data-snippet-id="ext.5d8a17e01caf6301de3f27ff33d6c015" data-snippet-saved="false" data-codota-status="done">    <span class="pl-c">// Token given by Stripe during registration</span>
+    <span class="pl-c">// Example:</span>
+    bank_token <span class="pl-k">=</span> {
+            id<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>rp_038iviu9hff24f<span class="pl-pds">"</span></span>,
+            active_account <span class="pl-k">:</span> {
+                id<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>ba_foie32oidn2f<span class="pl-pds">"</span></span>,
+            }
+            <span class="pl-c">// More here</span>
+    }
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> isInSession
+<span class="pl-k">+</span> userType
+
+###/login
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> user __(Can be username or emailAddress)__
+<span class="pl-k">+</span> password
+
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> isInSession
+<span class="pl-k">+</span> userType
+
+
+
+##Sessions
+__All endpoints here must look like this<span class="pl-k">:</span>__ _<span class="pl-k">&amp;</span>lt;baseurl<span class="pl-k">&amp;</span>gt;<span class="pl-k">+</span><span class="pl-sr"><span class="pl-pds">/</span>sessions<span class="pl-pds">/</span></span>_
+
+
+###/getCourses
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> latitude
+<span class="pl-k">+</span> longitude
+
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+<span class="pl-k">+</span> coursesFound __(<span class="pl-s3">Boolean</span>)__
+<span class="pl-k">+</span> courseData
+
+<span class="pl-k">&lt;</span>pre<span class="pl-k">&gt;</span>
+    <span class="pl-c">// Example</span>
+    courseData <span class="pl-k">=</span> [
+    [<span class="pl-s1"><span class="pl-pds">"</span>SPAN 1001<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>University of Georgia(UGA)<span class="pl-pds">"</span></span>],
+    [<span class="pl-s1"><span class="pl-pds">"</span>PSYC 2001<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>University of Georgia(UGA)<span class="pl-pds">"</span></span>],
+    ];
+<span class="pl-k">&lt;</span>/pre<span class="pl-k">&gt;</span>
+
+###/activeTutor
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> latitude
+<span class="pl-k">+</span> longitude
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> endTime __(Long time Milliseconds)__
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+
+###/findActiveTutors
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> latitude
+<span class="pl-k">+</span> longitude
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> course
+<span class="pl-k">+</span> miles __\[OPTIONAL\] (Integer <span class="pl-k">-&gt;</span> max distance to search by. Defaults to <span class="pl-c1">3</span>)__
+<span class="pl-k">+</span> endTime __(Long <span class="pl-k">-&gt;</span> time <span class="pl-k">in</span> Milliseconds)__
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+<span class="pl-k">+</span> foundTutors __(<span class="pl-s3">Boolean</span>)__
+<span class="pl-k">+</span> tutors
+<span class="pl-k">&lt;</span>pre<span class="pl-k">&gt;</span>
+    <span class="pl-c">// Example</span>
+    tutors <span class="pl-k">=</span> [
+        {
+            <span class="pl-s1"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>John Cena<span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>tutorId<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">903778</span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>isCertified<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>tutorPhone<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>6783219900<span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>course<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>PORT 2001<span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>rate<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">8</span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>biography<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>major<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>experience<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>reviews<span class="pl-pds">"</span></span><span class="pl-k">:</span> [ ],
+            <span class="pl-s1"><span class="pl-pds">"</span>rating<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>
+        },
+        <span class="pl-c">// More results</span>
+    ]
+<span class="pl-k">&lt;</span>/pre<span class="pl-k">&gt;</span>
+
+###/selectTutor
+<span class="pl-k">+</span> ####params
+    <span class="pl-k">+</span> tutorId
+    <span class="pl-k">+</span> userId
+    <span class="pl-k">+</span> course
+    <span class="pl-k">+</span> studentPhone __(<span class="pl-s3">String</span> <span class="pl-k">-</span> phone number)__
+
+<span class="pl-k">+</span> ####response
+    <span class="pl-k">+</span> msg
+    <span class="pl-k">+</span> code
+    <span class="pl-k">+</span> tutorPhone __(<span class="pl-s3">String</span>)__
+    <span class="pl-k">+</span> tutorName
+    <span class="pl-k">+</span> sessionId __(<span class="pl-s3">String</span>)__
+    <span class="pl-k">+</span> course
+    <span class="pl-k">+</span> rate __(Float)__
+
+###/tuteeBegin, /tutorBegin
+__Note<span class="pl-k">:</span>__ These are two separate endpoints. They behave the exact same way
+on the client<span class="pl-k">-</span>side.
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> sessionId
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+<span class="pl-k">+</span> hasBegun __(<span class="pl-s3">Boolean</span>)__
+
+
+###/tuteeEnd, /tutorEnd
+__Note<span class="pl-k">:</span>__ These are two separate endpoints. They behave the exact same way
+on the client<span class="pl-k">-</span>side.
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> sessionId
+
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code
+<span class="pl-k">+</span> hasEnded __(<span class="pl-s3">Boolean</span>)__
+
+
+###/review
+<span class="pl-k">+</span> ####params
+<span class="pl-k">+</span> userId
+<span class="pl-k">+</span> sessionId
+<span class="pl-k">+</span> rating __(Float <span class="pl-k">-</span> <span class="pl-c1">1</span> <span class="pl-k">-</span> <span class="pl-c1">5</span>, increments of <span class="pl-c1">0.5</span>)__
+<span class="pl-k">+</span> title __ [OPTIONAL] (<span class="pl-s3">String</span> <span class="pl-k">-</span> just the title of the review)__
+<span class="pl-k">+</span> details __[OPTIONAL] (<span class="pl-s3">String</span> <span class="pl-k">-</span> the actual review)__
+
+
+<span class="pl-k">+</span> ####response
+<span class="pl-k">+</span> msg
+<span class="pl-k">+</span> code</pre></div>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </div>
+        
+
+      </div>
+    </div>
+  </div>
+  <div>&nbsp;</div>
+  </div><script>
+    function showCanonicalImages() {
+      var images = document.getElementsByTagName('img');
+      if (!images) {
+        return;
+      }
+      for (var index = 0; index < images.length; index++) {
+        var image = images[index];
+        if (image.getAttribute('data-canonical-src')) {
+          image.src = image.getAttribute('data-canonical-src');
+        }
+      }
+    }
+    function scrollToHash() {
+      if (location.hash && !document.querySelector(":target")) {
+        var element = document.getElementById('user-content-' + location.hash.slice(1));
+        if (element) {
+           element.scrollIntoView();
+        }
+      }
+    }
+    window.onhashchange = function() {
+      scrollToHash();
+    }
+    window.onload = function() {
+      scrollToHash();
+    }
+    showCanonicalImages();
+  </script>
+
+<div class="codota-scope"><div class="green-popovers-container"></div><div data-snippet-id="ext.fdf248316d4edc748a75d77cc3366307" class="top-bar-placeholder" style="top: 170.996536254883px; left: 758.333336830139px; display: none; opacity: 0.3;"><a class="watermark" rel="tooltip" data-container=".codota-scope" data-delay="500" data-title="Info available for 0 elements in snippet. Click for details..." data-original-title="" title=""></a><button link="https://www.codota.com/codebox/" target="_blank" class="codebox-badge" data-container=".green-popovers-container" data-toggle="popover" data-trigger="manual" data-html="true" data-placement="top" style="display: none;">In CodeBox</button><button class="codota-black-btn codebox-save-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" data-original-title="" title=""><i class="fa fa-briefcase"></i> Save</button><button class="codota-white-btn codebox-save-selection-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" style="display: none;" data-original-title="" title=""><i class="fa fa-bars"></i> Save Selection</button><button class="codota-white-btn copy-to-clipboard pull-right"><i class="fa fa-copy"></i> Copy</button><button class="codota-white-btn share-snippet-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top"><i class="fa fa-share"></i> Share</button></div><div data-snippet-id="ext.f7214d616c4704160fa1a8318151ac5b" class="top-bar-placeholder" style="top: 2509.93754350586px; left: 758.329888343811px; display: none; opacity: 0.3;"><a class="watermark" rel="tooltip" data-container=".codota-scope" data-delay="500" data-title="Info available for 0 elements in snippet. Click for details..." data-original-title="" title=""></a><button link="https://www.codota.com/codebox/" target="_blank" class="codebox-badge" data-container=".green-popovers-container" data-toggle="popover" data-trigger="manual" data-html="true" data-placement="top" style="display: none;">In CodeBox</button><button class="codota-black-btn codebox-save-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" data-original-title="" title=""><i class="fa fa-briefcase"></i> Save</button><button class="codota-white-btn codebox-save-selection-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" style="display: none;" data-original-title="" title=""><i class="fa fa-bars"></i> Save Selection</button><button class="codota-white-btn copy-to-clipboard pull-right"><i class="fa fa-copy"></i> Copy</button><button class="codota-white-btn share-snippet-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top"><i class="fa fa-share"></i> Share</button></div><div data-snippet-id="ext.5d8a17e01caf6301de3f27ff33d6c015" class="top-bar-placeholder" style="top: 3393.63542250977px; left: 758.329888343811px; display: none; opacity: 0.3;"><a class="watermark" rel="tooltip" data-container=".codota-scope" data-delay="500" data-title="Info available for 0 elements in snippet. Click for details..." data-original-title="" title=""></a><button link="https://www.codota.com/codebox/" target="_blank" class="codebox-badge" data-container=".green-popovers-container" data-toggle="popover" data-trigger="manual" data-html="true" data-placement="top" style="display: none;">In CodeBox</button><button class="codota-black-btn codebox-save-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" data-original-title="" title=""><i class="fa fa-briefcase"></i> Save</button><button class="codota-white-btn codebox-save-selection-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" style="display: none;" data-original-title="" title=""><i class="fa fa-bars"></i> Save Selection</button><button class="codota-white-btn copy-to-clipboard pull-right"><i class="fa fa-copy"></i> Copy</button><button class="codota-white-btn share-snippet-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top"><i class="fa fa-share"></i> Share</button></div><div data-snippet-id="ext.6714b3b04382019da2dd69c040db657e" class="top-bar-placeholder" style="top: 3159.00002900391px; left: 757.329888343811px; display: none; opacity: 0.3;"><a class="watermark" rel="tooltip" data-container=".codota-scope" data-delay="500" data-title="Info available for 0 elements in snippet. Click for details..." data-original-title="" title=""></a><button link="https://www.codota.com/codebox/" target="_blank" class="codebox-badge" data-container=".green-popovers-container" data-toggle="popover" data-trigger="manual" data-html="true" data-placement="top" style="display: none;">In CodeBox</button><button class="codota-black-btn codebox-save-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" data-original-title="" title=""><i class="fa fa-briefcase"></i> Save</button><button class="codota-white-btn codebox-save-selection-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top" style="display: none;" data-original-title="" title=""><i class="fa fa-bars"></i> Save Selection</button><button class="codota-white-btn copy-to-clipboard pull-right"><i class="fa fa-copy"></i> Copy</button><button class="codota-white-btn share-snippet-btn pull-right" data-container=".green-popovers-container" data-trigger="manual" data-html="true" data-placement="top"><i class="fa fa-share"></i> Share</button></div></div><form id="codebox-form" method="post" style="display: none;"></form></body></html>
