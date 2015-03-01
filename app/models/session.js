@@ -43,9 +43,9 @@ var Transfer = require("../models/transfer");
 var sessionSchema = new mongoose.Schema({
 
 	_creditCard: {type: Number, ref: "CreditCard"},
-	_tutor: {type: Number, ref: "User", required: true},
+	_tutor: {type: Number, ref: "Users", required: true},
 	tutorPhone: String,
-	_student: {type: Number, ref: "User", required: true},
+	_student: {type: Number, ref: "Users", required: true},
 	studentPhone: String,
 	appointmentCreated: {type: Date, default: new Date()},
 	appointmentBegin: Date,

@@ -4,6 +4,7 @@ var router = express.Router();
 var Session = require("../models/session");
 var User = require("../models/user");
 var Active = require("../models/active");
+var Review = require("../models/review");
 
 // Function to convert miles to meters
 var milesToMeters = require("../../util").milesToMeters;
@@ -156,7 +157,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    		tutor.major = data.major;
 	    		tutor.year = data.year;
 
-	    		tutor.experience = data._sessions.length;
+	    		tutor.experience = data.experience;
 	    		tutor.reviews = data._reviews;
 	    		tutor.rating = data.rating;
 
@@ -400,6 +401,77 @@ router.post(path('/tutorEnd'), function(req, res) {
 					});
 				}
 			})
+		}
+	});
+});
+
+router.post(path('/review'), function(req, res) {
+	var input = JSON.parse(req.body);
+
+	var sessionId = input.sessionId;
+	var rating = parseFloat(input.rating);
+	var details = input.details;
+	var title = input.title;
+
+	Session.findOne({
+		"_id": sessionId
+	})
+	.populate("_student")
+	.populate("_tutor")
+	.exec(function(err, session) {
+		if (err || !session) {
+			console.log(err);
+			res.send({
+				msg: "FAILURE",
+				code: failure,
+				err: err,
+			});
+		} else {
+			var _tutor = session._tutor._id;
+			var _student = session._student._id;
+			var studentUsername = session._student.username;
+			var course = session.course;
+			var hourlyRate = session.hourlyRate;
+
+			var reviewParams = {
+				"_student": _student,
+				"studentUsername": studentUsername,
+				"_tutor": _tutor,
+				"_session": sessionId,
+				"rating": rating,
+				"details": details,
+				"title": title,
+				"course": course,
+				"hourlyRate": hourlyRate,
+			};
+
+			var review = new Review(reviewParams);
+			review.save(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						code: failure,
+						err: err,
+					});
+				} else {
+					session._tutor.addReview(review, function(err) {
+						if (err) {
+							console.log(err);
+							res.send({
+								msg: "FAILURE",
+								code: failure,
+								err: err,
+							});	
+						} else {
+							res.send({
+								msg: "SUCCESS",
+								code: success,
+							});
+						}
+					});
+				}
+			});
 		}
 	});
 });

@@ -19,7 +19,6 @@ var SALT_WORK_FACTOR = 12;
 var userSchema = new mongoose.Schema({
 
 	_creditCards: {type: [Number], ref: "CreditCards", default: []},
-	_sessions: {type: [Number], ref: "Sessions", default: []},
 	_bankAccounts: {type: [Number], ref: "BankAccounts", default: []},
 	firstName: String,
 	lastName: String,
@@ -44,7 +43,10 @@ var userSchema = new mongoose.Schema({
 	biography: {type: String, default: ""},
 	major: {type: String, default: ""},
 	year: {type: String, default: ""},
-	rating: {type: Number, default: -1},
+	// Starts at -1. Then, averages ratings of 1 - 5
+	rating: {type: Number, default: 0},
+	// Number of sessions done
+	experience: {type: Number, default: 0},
 });
 
 userSchema.plugin(autoIncrement.plugin, {
@@ -54,10 +56,18 @@ userSchema.plugin(autoIncrement.plugin, {
 });
 
 // Array fields can have single pieces of data pushed to them
-
-userSchema.methods.addCreditCards = function(creditCard) {this._creditCards.push(creditCard)};
-userSchema.methods.addSession = function(session) {this._sessions.push(session)};
-userSchema.methods.addReview = function(review) {this.reviews.push(review)};
+userSchema.methods.addReview = function(review, callback) {
+	var self = this;
+	
+	var rating = self.rating * self._reviews.length;
+	rating += review.rating;
+	rating /= (self._reviews.length + 1);
+	
+	self.rating = rating;
+	self._reviews.push(review._id);
+	self.experience += 1;
+	self.save(callback);
+};
 
 userSchema.methods.useTutorCode = function(tutorCode, callback) {
 	var self = this;

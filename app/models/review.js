@@ -5,13 +5,13 @@ var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
 
 var reviewSchema = new mongoose.Schema({
-	_tutor: {type: Number, ref: "User"},
-	_student: {type: Number, ref: "User"},
-	tutorName: {type: String, required: true},
-	tutorId: {type: Number, ref: "User"},
+	_tutor: {type: Number, ref: "Users"},
+	_student: {type: Number, ref: "Users"},
+	_session: {type: Number, ref: "Sessions", unique: true, required: true},
+	studentUsername: {type: String, required: true},
 	rating: {type: Number, required: true},
-	title: String,
-	description: String,
+	title: {type: String, default: ""},
+	details: {type: String, default: ""},
 	course: String,
 	hourlyRate: Number,
 	dateWritten: {type: Date, default: new Date()},
