@@ -17,8 +17,10 @@ var data = {
 		cookiePassword: "insertpasswordhere",
 		baseRate: 8,
 		baseRateCertified: 18,
-		toucan_bank_id: "rp_15bKjgHnsjstms08sHgByby6",
+		toucan_bank_id: "ba_15bJsYHnsjstms08Q6FPoH5I",
+		toucan_transfer_id: "rp_15bJqCHnsjstms08oyZH6xmU",
 		percentTutor: 80,
+		percentStripe: 5,
 	}
 };
 
