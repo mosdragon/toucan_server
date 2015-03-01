@@ -14,6 +14,9 @@ var milesToMeters = require("../../util").milesToMeters;
 var success = 200;
 var failure = 500;
 
+var successMsg = "SUCCESS";
+var failureMsg = "FAILURE";
+
 var basepath = "";
 var path = function(addition) {
 	return basepath + addition;
@@ -55,7 +58,7 @@ router.post(path('/signupStudent'), function(req, res) {
 	member.save(function(err) {
 		if (err) {
 			res.send({
-				msg: "ERRORORR",
+				msg: failureMsg,
 				code: failure,
 			});
 			console.log(err);
@@ -66,13 +69,13 @@ router.post(path('/signupStudent'), function(req, res) {
 				if (err) {
 					console.log(err);
 					res.send({
-						msg: "FAILURE",
+						msg: failureMsg,
 						error: err,
 						code: failure
 					})
 				} else {
 					res.send({
-						msg: "SUCESSS",
+						msg: successMsg,
 						code: success,
 						userId: member._id,
 						isInSession: member.isInSession,
@@ -134,7 +137,7 @@ router.post(path('/signupTutor'), function(req, res) {
 	member.save(function(err) {
 		if (err) {
 			res.send({
-				msg: "FAILURE",
+				msg: failureMsg,
 				code: failure,
 				err: err,
 			});
@@ -146,7 +149,7 @@ router.post(path('/signupTutor'), function(req, res) {
 				if (err) {
 					console.log(err);
 					res.send({
-						msg: "FAILURE",
+						msg: failureMsg,
 						error: err,
 						code: failure
 					});
@@ -155,7 +158,7 @@ router.post(path('/signupTutor'), function(req, res) {
 						if (err) {
 							console.log(err);
 							res.send({
-								msg: "FAILURE",
+								msg: failureMsg,
 								error: err,
 								code: failure,
 							});
@@ -164,13 +167,13 @@ router.post(path('/signupTutor'), function(req, res) {
 								if (err) {
 									console.log(err);
 									res.send({
-										msg: "FAILURE",
+										msg: failureMsg,
 										error: err.mesage,
 										code: failure
 									});
 								} else {
 									res.send({
-										msg: "SUCESSS",
+										msg: successMsg,
 										code: success,
 										userId: member._id,
 										isInSession: member.isInSession,
@@ -209,7 +212,7 @@ router.post(path('/login'), function(req, res) {
 		if (err || !user) {
 			console.log(err);
 			res.send({
-				msg: "FAILURE",
+				msg: failureMsg,
 				code: failure,
 				error: err,
 			});
@@ -219,7 +222,7 @@ router.post(path('/login'), function(req, res) {
 				if (err || !isMatch) {
 					console.log(err);
 					res.send({
-						msg: "FAILURE",
+						msg: failureMsg,
 						code: failure,
 						reason: "Bad username or password",
 					});
@@ -235,71 +238,9 @@ router.post(path('/login'), function(req, res) {
 			});			
 		} else {
 			res.send({
-				msg: "FAILURE",
+				msg: failureMsg,
 				code: failure,
 				reason: "Bad username or password",
-			});
-		}
-	});
-});
-
-router.post(path("/generateTutorCode"), function(req, res) {
-	var input = JSON.parse(req.body);
-
-	var firstName = input.firstName;
-	var lastName = input.lastName;
-	var emailAddress = input.emailAddress;
-	var coursesTaught = input.coursesTaught;
-	var isCertified = input.isCertified;
-	var rates = input.rates;
-
-	for (var index in coursesTaught) {
-		var coursename = coursesTaught[index];
-		if (!rates[coursename]) {
-			if (isCertified) {
-				rates[coursename] = baseRateCertified;
-			} else {
-				rates[coursename] = baseRate;
-			}
-		}
-	}
-
-	console.log("Ensured all courses have rates");
-
-	var params = {
-		firstName : firstName,
-		lastName : lastName,
-		emailAddress : emailAddress,
-		coursesTaught : coursesTaught,
-		isCertified : isCertified,
-		rates : rates,
-	};
-
-	var tutorCode = new TutorCode(params);
-	tutorCode.save(function(err) {
-		if (err) {
-			console.log(err);
-			res.send({
-				err: err,
-				msg: "FAILURE",
-				code: failure,
-			});
-		} else {
-			tutorCode.generateTutorCode(function(err, code) {
-				if (err) {
-					res.send({
-						err: err,
-						msg: "FAILURE",
-						code: failure,
-					});
-				} else {
-					res.send({
-						msg: "SUCESSS",
-						code: success,
-						tutorCode: code,
-						emailAddress: emailAddress,
-					});
-				}
 			});
 		}
 	});
@@ -316,7 +257,7 @@ router.post(path("/checkCodeValid"), function(req, res) {
 		if (err || !code) {
 			res.send({
 				err: err,
-				msg: "FAILURE",
+				msg: failureMsg,
 				code: failure,
 				isValid: false,
 			});

@@ -233,6 +233,7 @@ var chargeStudent = function(session, callback) {
 												console.log(err);
 												return callback(err);
 											} else {
+												// Schedule paying tutor in 2 days
 												var date = twoDaysLater(new Date());
 												var job = schedule.scheduleJob(date, payTutor
 													.bind(null, self, function(err) {
@@ -242,6 +243,18 @@ var chargeStudent = function(session, callback) {
 														}
 													})
 												);
+
+												// Schedule paying Toucan in 2 days
+												var date = twoDaysLater(new Date());
+												var job = schedule.scheduleJob(date, payToucan
+													.bind(null, self, function(err) {
+														console.log("Toucan Payment Is Complete!");
+														if (err) {
+															console.log(err);
+														}
+													})
+												);
+
 												return callback(err);
 											}
 										});
@@ -319,15 +332,6 @@ var payTutor = function(session, callback) {
 								if (err) {
 									callback(err);
 								} else {
-									var date = twoDaysLater(new Date());
-									var job = schedule.scheduleJob(date, payToucan
-										.bind(null, self, function(err) {
-											console.log("Toucan Payment Is Complete!");
-											if (err) {
-												console.log(err);
-											}
-										})
-									);
 									self.save(callback);
 								}
 							});
