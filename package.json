@@ -6,6 +6,7 @@
     "start": "node server.js",
     "begin": "node ./bin/www"
   },
+  "main": "server.js",
   "dependencies": {
     "express": "~4.2.0",
     "static-favicon": "~1.0.0",

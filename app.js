@@ -42,7 +42,7 @@ app.use(express.static (path.join(__dirname, 'public')));
 
 // app.use('/', routes);
 app.get('/', function(req, res){
-  res.render('chat', {});
+  res.render('index', {});
 });
 
 app.use('/api/v1/users', users);
