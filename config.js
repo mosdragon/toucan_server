@@ -5,7 +5,8 @@ var mongodb_connection_string = 'mongodb://localhost/' + db_name;
 
 //take advantage of openshift env vars when available:
 if (process.env.OPENSHIFT_MONGODB_DB_URL){
-  mongodb_connection_string = process.env.OPENSHIFT_MONGODB_DB_URL + db_name;
+	db_name = "beta";
+  	mongodb_connection_string = process.env.OPENSHIFT_MONGODB_DB_URL + db_name;
 }
 
 
