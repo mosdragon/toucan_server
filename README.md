@@ -184,11 +184,11 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 	// Example
 	courseData = [
 		[
-		"course": "SPAN 1001",
+		"coursename": "SPAN 1001",
 		"school": "University of Georgia(UGA)"
 		],
 		[
-		"course": "PSYC 2001",
+		"coursename": "PSYC 2001",
 		"school": "University of Georgia(UGA)"
 		],
 	];
