@@ -13,13 +13,12 @@ var failureMsg = "FAILURE";
 var baseRate = require("../../config").dev.baseRate;
 var baseRateCertified = require("../../config").dev.baseRateCertified;
 
+var courseRadius = require("../../config").dev.courseRadius;
+
 var basepath = "";
 var path = function(addition) {
 	return basepath + addition;
 };
-
-// Function to convert miles to meters
-var milesToMeters = require("../../util").milesToMeters;
 
 router.post(path("/addCourse"), function(req, res) {
 	var input = JSON.parse(req.body);
@@ -28,13 +27,6 @@ router.post(path("/addCourse"), function(req, res) {
 	var school = input.school;
 	var latitude = input.latitude;
 	var longitude = input.longitude;
-	var miles = input.miles;
-
-	// Preset everything to UGA
-	latitude = 33.948005;
-	longitude = -83.377322;
-	school = "University of Georgia (UGA)";
-	miles = 10;
 
 	var location = [longitude, latitude];
 

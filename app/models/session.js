@@ -29,6 +29,9 @@ var stripe = require("stripe")(stripe_api_key);
 var toucan_bank_id = require("../../config").dev.toucan_bank_id;
 var toucan_transfer_id = require("../../config").dev.toucan_transfer_id;
 
+var defaultHours = require("../../config").dev.defaultHours;
+var baseTime = require("../../config").dev.baseTime;
+
 // How much Toucan keeps vs what percentage a tutor gets
 var percentTutor = require("../../config").dev.percentTutor / 100;
 var percentStripe = require("../../config").dev.percentStripe / 100;
@@ -66,56 +69,66 @@ var sessionSchema = new mongoose.Schema({
 sessionSchema.methods.tuteeBegin = function(callback) {
 	var self = this;
 	self.tuteeTimeBegin = new Date();
-	if (self.tutorTimeBegin !== undefined && self.tutorTimeBegin < self.tuteeTimeBegin) {
-		self.appointmentBegin = self.tuteeTimeBegin;
-		self.hasBegun = true;
-		self.save(callback)
-	} else {
-		self.save(callback);
-	}
+	self.appointmentBegin = self.tuteeTimeBegin;
+	self.save(callback);
 };
 
 sessionSchema.methods.tutorBegin = function(callback) {
 	var self = this;
 	self.tutorTimeBegin = new Date();
-	if (self.tuteeTimeBegin !== undefined && self.tuteeTimeBegin < self.tutorTimeBegin) {
-		self.appointmentBegin = self.tutorTimeBegin;
-		self.hasBegun = true;
-		self.save(callback);
-	} else {
-		self.save(callback);
-	}
+	self.appointmentBegin = self.tutorTimeBegin;
+	self.save(callback);
 };
 
 sessionSchema.methods.tuteeEnd = function(callback) {
 	var self = this;
 	self.tuteeTimeEnd = new Date();
-	if (self.tutorTimeEnd !== undefined && self.tutorTimeEnd < self.tuteeTimeEnd) {
-		self.appointmentEnd = self.tuteeTimeEnd;
-		self.endAppointment(function(err) {
-			self.save(callback);
-		});
-	} else {
-		self.save(callback);
-	}
+	self.appointmentEnd = self.tuteeTimeEnd;
+
+	self.save(function(err) {
+		if (err) {
+			return callback(err);
+		} else {
+			calculateCosts(self, callback);
+		}
+	});
+
+	self.checkAppointmentDone();
 };
 
 sessionSchema.methods.tutorEnd = function(callback) {
 	var self = this;
 	self.tutorTimeEnd = new Date();
-	if (self.tuteeTimeEnd !== undefined && self.tuteeTimeEnd < self.tutorTimeEnd) {
-		self.appointmentEnd = self.tutorTimeEnd;
+	self.appointmentEnd = self.tutorTimeEnd;
+
+	self.save(function(err) {
+		if (err) {
+			return callback(err);
+		} else {
+			calculateCosts(self, callback);
+		}
+	});
+	self.checkAppointmentDone();
+};
+
+sessionSchema.methods.checkAppointmentDone = function() {
+	var self = this;
+	console.log("checkAppointmentDone");
+	if (self.appointmentBegin && self.tutorTimeBegin && self.tuteeTimeBegin
+		&& self.appointmentEnd && self.tutorTimeEnd && self.tuteeTimeEnd) {
+		console.log("Yup, appointment is definitely done");
 		self.endAppointment(function(err) {
-			self.save(callback);
-		});
-	} else {
-		self.save(callback);
+			if (err) {
+				console.log(err);
+			} else {
+				console.log("Appointment finished without any errors. We good!");
+			}
+		})
 	}
 };
 
-sessionSchema.methods.endAppointment = function(callback) {
-	var self = this;
-	
+var calculateCosts = function(session, callback) {
+	var self = session;
 	self.appointmentEnd = new Date();
 	self.hasEnded = true;
 
@@ -139,8 +152,8 @@ sessionSchema.methods.endAppointment = function(callback) {
 	}
 
 	totalHours += fullHours;
-	if (totalHours < 0.75) {
-		totalHours = 0.75;
+	if (totalHours >=  baseTime && totalHours < 0.75) {
+		totalHours = defaultHours;
 	}
 	console.log("Total Hours: " + totalHours);
 
@@ -149,33 +162,39 @@ sessionSchema.methods.endAppointment = function(callback) {
 	// Rounds amount due to 2 decimal places to pennies
 	var amountDue = Math.floor(self.hoursOfService * self.hourlyRate * 100) / 100;
 	console.log(amountDue);
-	self.totalCost = amountDue;
+	return callback(null, amountDue);
+};
 
-	self.save(function(err) {
+sessionSchema.methods.endAppointment = function(callback) {
+	var self = this;
+	
+	calculateCosts(self, function(err, amountDue) {
+		self.totalCost = amountDue;
 
-		var immediately = new Date(Date.now());
+		self.save(function(err) {
 
-		var updateJob = schedule.scheduleJob(immediately, 
-			updateIsInSession.bind(null, self, function(err) {
-				console.log("updateIsInSession complete");
-				if (err) {
-					console.log(err);
-				}
-			})
-		);
+			var immediately = new Date(Date.now());
 
-		var date = minuteLater(new Date());
+			var updateJob = schedule.scheduleJob(immediately, 
+				updateIsInSession.bind(null, self, function(err) {
+					console.log("updateIsInSession complete");
+					if (err) {
+						console.log(err);
+					}
+				})
+			);
 
-
-		var chargeStudentJob = schedule.scheduleJob(date, chargeStudent
-			.bind(null, self, function(err) {
-				console.log("ChargeStudent complete");
-				if (err) {
-					console.log(err);
-				}
-			})
-		);
-		return callback(err);
+			var date = minuteLater(new Date());
+			var chargeStudentJob = schedule.scheduleJob(date,
+				chargeStudent.bind(null, self, function(err) {
+					console.log("ChargeStudent complete");
+					if (err) {
+						console.log(err);
+					}
+				})
+			);
+			return callback(err);
+		});
 	});
 };
 

@@ -13,6 +13,8 @@ var milesToMeters = require("../../util").milesToMeters;
 var tutorRadius = require("../../config").dev.tutorRadius;
 var courseRadius = require("../../config").dev.courseRadius;
 
+var percentTutor = require("../../config").dev.percentTutor / 100;
+
 var success = 200;
 var failure = 500;
 
@@ -27,21 +29,18 @@ var path = function(addition) {
 
 router.post(path("/getCourses"), function(req, res) {
 	var input = JSON.parse(req.body);
-
-	var school = input.school;
 	var latitude = input.latitude;
 	var longitude = input.longitude;
 	var miles = input.miles;
 
-	// Preset everything to UGA
-	school = "University of Georgia (UGA)";
-	// Preset dist from student to campus as 15 miles
+	// Preset dist from student to campus
 	miles = courseRadius;
+
+	console.log("Miles away " + miles);
 
 	var location = [longitude, latitude];
 
 	var params = {
-		"school": school,
 		"location": {
 	        $near: {
 		    	$geometry: {
@@ -63,6 +62,7 @@ router.post(path("/getCourses"), function(req, res) {
 				coursesFound: false,
 			});
 		} else if (!courses || courses.length === 0) {
+			console.log("Courses: " + courses);
 			console.log("No courses found");
 			var message = "It looks like there are no courses offered near you. Please try searching"
 				+ " closer to the University of Georgia(UGA) campus."; 
@@ -77,7 +77,10 @@ router.post(path("/getCourses"), function(req, res) {
 			courses.forEach(function(course) {
 				var coursename = course.course;
 				var school = course.school;
-				var packed = [coursename, school];
+				var packed = {
+					"coursename": coursename,
+					"school": school,
+				};
 
 				courseData.push(packed);
 			});
@@ -538,7 +541,7 @@ router.post(path('/tuteeEnd'), function(req, res) {
 				session: session
 			});
 		} else {
-			session.tuteeEnd(function(err) {
+			session.tuteeEnd(function(err, payDue) {
 				if (err) {
 					console.log(err);
 					res.send({
@@ -551,6 +554,7 @@ router.post(path('/tuteeEnd'), function(req, res) {
 						msg: successMsg,
 						code: success,
 						hasEnded: session.hasEnded,
+						payDue: payDue,
 					});
 				}
 			})
@@ -575,7 +579,9 @@ router.post(path('/tutorEnd'), function(req, res) {
 				session: session
 			});
 		} else {
-			session.tutorEnd(function(err) {
+			session.tutorEnd(function(err, amount) {
+				var pennies = Math.floor(amount * 100 * percentTutor);
+				var compensation = pennies / 100;
 				if (err) {
 					console.log(err);
 					res.send({
@@ -587,7 +593,7 @@ router.post(path('/tutorEnd'), function(req, res) {
 					res.send({
 						msg: successMsg,
 						code: success,
-						hasEnded: session.hasEnded,
+						compensation: compensation,
 					});
 				}
 			})

@@ -14,6 +14,7 @@
     "debug": "~0.7.4",
     "express": "~4.2.0",
     "jade": "*",
+    "mathjs": "^1.4.0",
     "mongoose": "^3.8.12",
     "mongoose-auto-increment": "^3.0.8",
     "morgan": "~1.0.0",
