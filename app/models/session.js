@@ -153,8 +153,21 @@ sessionSchema.methods.endAppointment = function(callback) {
 
 	self.save(function(err) {
 
-		var date = twoDaysLater(new Date());
-		var job = schedule.scheduleJob(date, chargeStudent
+		var immediately = new Date(Date.now());
+
+		var updateJob = schedule.scheduleJob(immediately, 
+			updateIsInSession.bind(null, self, function(err) {
+				console.log("updateIsInSession complete");
+				if (err) {
+					console.log(err);
+				}
+			})
+		);
+
+		var date = minuteLater(new Date());
+
+
+		var chargeStudentJob = schedule.scheduleJob(date, chargeStudent
 			.bind(null, self, function(err) {
 				console.log("ChargeStudent complete");
 				if (err) {
@@ -164,8 +177,24 @@ sessionSchema.methods.endAppointment = function(callback) {
 		);
 		return callback(err);
 	});
-	
 };
+
+var updateIsInSession = function(session, callback) {
+	var tutorId = session._tutor;
+	var studentId = session._student;
+
+	User.findOneAndUpdate({"_id": tutorId}, {"isInSession": false}, function(err) {
+		if (err) {
+			console.log(err);
+		}
+		User.findOneAndUpdate({"_id": studentId}, {"isInSession": false}, function(err) {
+			if (err) {
+				console.log(err);
+			}
+			return callback();
+		})
+	});
+}
 
 var chargeStudent = function(session, callback) {
 	var self = session;

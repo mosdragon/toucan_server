@@ -47,6 +47,7 @@ var userSchema = new mongoose.Schema({
 	rating: {type: Number, default: 0},
 	// Number of sessions done
 	experience: {type: Number, default: 0},
+	isAvailable: {type: Boolean, default: false},
 });
 
 userSchema.plugin(autoIncrement.plugin, {

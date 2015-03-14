@@ -232,6 +232,7 @@ router.post(path('/login'), function(req, res) {
 						code: success,
 						userId: user._id,
 						isInSession: user.isInSession,
+						isAvailable: user.isAvailable,
 						userType: user.userType,
 					});
 				}

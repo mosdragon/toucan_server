@@ -23,6 +23,8 @@ var data = {
 		toucan_transfer_id: "rp_15bJqCHnsjstms08oyZH6xmU",
 		percentTutor: 80,
 		percentStripe: 5,
+		tutorRadius: 3, // in Miles
+		courseRadius: 15, // in Miles
 	}
 };
 

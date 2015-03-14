@@ -10,6 +10,9 @@ var Course = require("../models/course");
 // Function to convert miles to meters
 var milesToMeters = require("../../util").milesToMeters;
 
+var tutorRadius = require("../../config").dev.tutorRadius;
+var courseRadius = require("../../config").dev.courseRadius;
+
 var success = 200;
 var failure = 500;
 
@@ -33,7 +36,7 @@ router.post(path("/getCourses"), function(req, res) {
 	// Preset everything to UGA
 	school = "University of Georgia (UGA)";
 	// Preset dist from student to campus as 15 miles
-	miles = 15;
+	miles = courseRadius;
 
 	var location = [longitude, latitude];
 
@@ -118,41 +121,114 @@ router.post(path("/activeTutor"), function(req, res) {
 				error: err,
 			});
 		} else {
-			params._tutor = user._id;
-			params.coursesTaught = user.coursesTaught;
-			Active.findOne({_tutor: user._id}, function(err, active) {
-				if (err || !active) {
-					// No active exists for this person. Create a new one.
-					var active = new Active(params);
-					active.save(function(err) {
-						if (err) {
-							console.log(err);
-							res.send({
-								msg: "ERRORORR",
-								code: failure,
+			user.isAvailable = true;
+			user.isInSession = false;
+
+			user.save(function(err) {
+				if (err) {
+					console.log(err);
+					res.send({
+						msg: "FAILURE",
+						code: failure,
+					});
+				} else {
+					params._tutor = user._id;
+					params.coursesTaught = user.coursesTaught;
+					Active.findOne({_tutor: user._id}, function(err, active) {
+						if (err || !active) {
+							// No active exists for this person. Create a new one.
+							var active = new Active(params);
+							active.save(function(err) {
+								if (err) {
+									console.log(err);
+									res.send({
+										msg: "ERRORORR",
+										code: failure,
+									});
+								} else {
+									res.send({
+										msg: "SUCESSS",
+										code: success,
+									});
+								}
 							});
 						} else {
-							res.send({
-								msg: "SUCESSS",
-								code: success,
+							active.update(params, function(err) {
+								if (err) {
+									console.log(err);
+									res.send({
+										msg: "ERRORORR",
+										code: failure,
+									});
+								} else {
+									res.send({
+										msg: "SUCESSS",
+										code: success,
+										beginTime: beginTime,
+										endTime: endTime,
+										coursesTaught: active.coursesTaught,
+										isAvailable: user.isAvailable,
+										isInSession: user.isInSession,
+									});
+								}
 							});
 						}
 					});
+				}
+			});
+		}
+	});
+});
+
+router.post(path("/inactiveTutor"), function(req, res) {
+	var input = JSON.parse(req.body);
+	var userId = input.userId;
+
+	var endTime = new Date();
+
+
+	User.findOne({
+		'_id': userId
+	}).exec(function(err, user) {
+
+		if (err || !user) {
+			res.send({
+				msg: failureMsg,
+				code: failure,
+				error: err,
+			});
+		} else {
+
+			user.isAvailable = false;
+			user.isInSession = false;
+
+			user.save(function(err) {
+				if (err) {
+					res.send({
+						msg: failureMsg,
+						code: failure,
+						error: err,
+					});
 				} else {
-					active.update(params, function(err) {
+					var updates = {
+						"endTime": endTime,
+						"available": false,
+					}
+					Active.findOneAndUpdate({_tutor: user._id}, updates, function(err, active) {
 						if (err) {
-							console.log(err);
 							res.send({
-								msg: "ERRORORR",
+								msg: failureMsg,
 								code: failure,
+								error: err,
 							});
 						} else {
 							res.send({
 								msg: "SUCESSS",
 								code: success,
-								beginTime: beginTime,
-								endTime: endTime,
-								coursesTaught: active.coursesTaught,
+								beginTime: active.beginTime,
+								endTime: active.endTime,
+								isAvailable: user.isAvailable,
+								isInSession: user.isInSession,
 							});
 						}
 					});
@@ -319,15 +395,49 @@ router.post(path('/selectTutor'), function(req, res) {
 								extra: "Active save",
 							});				
 						} else {
-							res.send({
-								msg: successMsg,
-								code: success,
-								tutorPhone: tutorPhone,
-								tutorName: tutor.firstName + " " + tutor.lastName,
-								sessionId: session._id,
-								course: course,
-								rate: hourlyRate,
+							tutor.isAvailable = false;
+							tutor.isInSession = true;
 
+							tutor.save(function(err) {
+								if (err) {
+									console.log(err);
+									res.send({
+										msg: "Something went wrong. Please try another tutor.",
+										code: failure,
+										err: err,
+										extra: "Active save",
+									});	
+								} else {
+									var updates = {
+										"isInSession": true,
+									};
+									User.findOneAndUpdate({
+										"_id": userId,
+									},
+									updates,
+									function(err) {
+
+										if (err) {
+											console.log(err);
+											res.send({
+												msg: "Something went wrong. Please try another tutor.",
+												code: failure,
+												err: err,
+												extra: "Active save",
+											});		
+										} else {
+											res.send({
+												msg: successMsg,
+												code: success,
+												tutorPhone: tutorPhone,
+												tutorName: tutor.firstName + " " + tutor.lastName,
+												sessionId: session._id,
+												course: course,
+												rate: hourlyRate,
+											});
+										}
+									});
+								}
 							});
 						}		
 					});
