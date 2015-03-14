@@ -479,7 +479,6 @@ router.post(path('/tuteeBegin'), function(req, res) {
 					res.send({
 						msg: successMsg,
 						code: success,
-						hasBegun: session.hasBegun,
 					});
 				}
 			})
@@ -516,7 +515,6 @@ router.post(path('/tutorBegin'), function(req, res) {
 					res.send({
 						msg: successMsg,
 						code: success,
-						hasBegun: session.hasBegun,
 					});
 				}
 			})
@@ -541,7 +539,7 @@ router.post(path('/tuteeEnd'), function(req, res) {
 				session: session
 			});
 		} else {
-			session.tuteeEnd(function(err, payDue) {
+			session.tuteeEnd(function(err, amount) {
 				if (err) {
 					console.log(err);
 					res.send({
@@ -554,7 +552,7 @@ router.post(path('/tuteeEnd'), function(req, res) {
 						msg: successMsg,
 						code: success,
 						hasEnded: session.hasEnded,
-						payDue: payDue,
+						amount: amount,
 					});
 				}
 			})
@@ -579,9 +577,9 @@ router.post(path('/tutorEnd'), function(req, res) {
 				session: session
 			});
 		} else {
-			session.tutorEnd(function(err, amount) {
-				var pennies = Math.floor(amount * 100 * percentTutor);
-				var compensation = pennies / 100;
+			session.tutorEnd(function(err, cost) {
+				var pennies = Math.floor(cost * 100 * percentTutor);
+				var amount = pennies / 100;
 				if (err) {
 					console.log(err);
 					res.send({
@@ -593,7 +591,7 @@ router.post(path('/tutorEnd'), function(req, res) {
 					res.send({
 						msg: successMsg,
 						code: success,
-						compensation: compensation,
+						amount: amount,
 					});
 				}
 			})

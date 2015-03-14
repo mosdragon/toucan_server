@@ -180,25 +180,51 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 	+ code
 	+ coursesFound __(Boolean)__
 	+ courseData
-
-	``` javascript
-		// Example
-		courseData = [
-		["SPAN 1001", "University of Georgia(UGA)"],
-		["PSYC 2001", "University of Georgia(UGA)"],
-		];
-	```
+``` javascript
+	// Example
+	courseData = [
+		[
+		"course": "SPAN 1001",
+		"school": "University of Georgia(UGA)"
+		],
+		[
+		"course": "PSYC 2001",
+		"school": "University of Georgia(UGA)"
+		],
+	];
+```
 
 ###/activeTutor
 + ####params
   + latitude
   + longitude
   + userId
-  + endTime __(Long time Milliseconds)__
+  + endTime __(time in milliseconds --> _long_)__
 
 + ####response
   + msg
   + code
+  + beginTime
+  + endTime
+  + coursesTaught
+``` javascript
+// Example
+coursesTaught = ["PORT 2001", "SPAN 1001"];
+```
+  + isAvailable
+  + isInSession
+
+###/inactiveTutor
++ ####params
+	+ userId
+
++ ####response
+	+ msg
+	+ code
+	+ beginTime
+	+ endTime
+	+ isAvailable
+	+ isInSession
 
 ###/findActiveTutors
 + ####params
@@ -214,26 +240,26 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 	+ code
 	+ foundTutors __(Boolean)__
 	+ tutors
-	``` javascript
-		// Example
-		tutors = [
-			{
-				"name": "John Cena",
-				"tutorId": 903778,
-				"isCertified": true,
-				"tutorPhone": "6783219900",
-				"course": "PORT 2001",
-				"rate": 8,
-				"biography": "",
-				"major": "",
-				"year": "",
-				"experience": 0,
-				"reviews": [ ],
-				"rating": 0
-			},
-			// More results
-		]
-	```
+``` javascript
+	// Example
+	tutors = [
+		{
+			"name": "John Cena",
+			"tutorId": 903778,
+			"isCertified": true,
+			"tutorPhone": "6783219900",
+			"course": "PORT 2001",
+			"rate": 8,
+			"biography": "",
+			"major": "",
+			"year": "",
+			"experience": 0,
+			"reviews": [ ],
+			"rating": 0
+		},
+		// More results
+	]
+```
 
 ###/selectTutor
 + ####params
@@ -264,9 +290,7 @@ on the client-side.
 	+ hasBegun __(Boolean)__
 
 
-###/tuteeEnd, /tutorEnd
-__Note:__ These are two separate endpoints. They behave the exact same way
-on the client-side.
+###/tuteeEnd
 + ####params
 	+ userId
 	+ sessionId
@@ -275,7 +299,18 @@ on the client-side.
 + ####response
 	+ msg
 	+ code
-	+ hasEnded __(Boolean)__
+	+ amount __(Amount that will be charged on tutee's account)__
+
+###/tuteeEnd
++ ####params
+	+ userId
+	+ sessionId
+
+
++ ####response
+	+ msg
+	+ code
+	+ amount __(Amount that will be paid to the tutor's Bank Account)__
 
 
 ###/review
