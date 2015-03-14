@@ -4,22 +4,28 @@ var sessionCollection = "Session";
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose);
 
+var isLive = process.env.isLive;
+
 // Scheduling payments/transfers
 var schedule = require('node-schedule');
 var twoDaysLater = function(input) {
-	// input.setDate(input.getDate() + 2);
-	// input.setHours(input.getHours() + 2);
-
-	// Temporarily do it after 5 seconds
-	input.setSeconds(input.getSeconds() + 5);
+	if (isLive) {
+		input.setDate(input.getDate() + 2);
+		input.setHours(input.getHours() + 2);
+	} else {
+		// Do it after 5 seconds -- we're in test mode
+		input.setSeconds(input.getSeconds() + 5);
+	}
 	return input;
 };
 
 var minuteLater = function(input) {
-	// input.setMinutes(input.getMinutes() + 1);
-
-	// Temporarily do it after 5 seconds
-	input.setSeconds(input.getSeconds() + 5);
+	if (isLive) {
+		input.setMinutes(input.getMinutes() + 1);
+	} else {
+		// Do it after 5 seconds -- we're in test mode
+		input.setSeconds(input.getSeconds() + 5);
+	}
 	return input;
 };
 
@@ -35,7 +41,11 @@ var baseTime = require("../../config").dev.baseTime;
 // How much Toucan keeps vs what percentage a tutor gets
 var percentTutor = require("../../config").dev.percentTutor / 100;
 var percentStripe = require("../../config").dev.percentStripe / 100;
-var percentToucan = 1 - (percentTutor + percentStripe);
+var percentToucan = Math.floor((1 - (percentTutor + percentStripe))* 100) / 100;
+
+console.log("percentTutor: " + percentTutor);
+console.log("percentStripe: " + percentStripe);
+console.log("percentToucan: " + percentToucan);
 
 var User = require("../models/user");
 var CreditCard = require("../models/creditCard");
@@ -129,7 +139,6 @@ sessionSchema.methods.checkAppointmentDone = function() {
 
 var calculateCosts = function(session, callback) {
 	var self = session;
-	self.appointmentEnd = new Date();
 	self.hasEnded = true;
 
 	var begin = self.appointmentBegin;
