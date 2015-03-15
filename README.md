@@ -165,6 +165,17 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/users_
 	+ isAvailable
 	+ userType
 
+###/loginUserId
++ ####params
+	+ userId
+
++ ####response
+	+ msg
+	+ code
+	+ userId
+	+ isInSession
+	+ isAvailable
+	+ userType
 
 
 ##Sessions

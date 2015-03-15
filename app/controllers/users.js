@@ -229,7 +229,7 @@ router.post(path('/login'), function(req, res) {
 					});
 				} else {
 					res.send({
-						msg: "SUCCESS",						
+						msg: successMsg,						
 						code: success,
 						userId: user._id,
 						isInSession: user.isInSession,
@@ -238,6 +238,44 @@ router.post(path('/login'), function(req, res) {
 					});
 				}
 			});			
+		} else {
+			res.send({
+				msg: failureMsg,
+				code: failure,
+				reason: "Bad username or password",
+			});
+		}
+	});
+});
+
+router.post(path('/loginUserId'), function(req, res) {
+	var input = JSON.parse(req.body);
+	var userId = input.userId;
+
+	var params = {
+		"_id": userId,
+	};
+
+	User.findOne(params)
+	.exec(function(err, user) {
+		if (err || !user) {
+			console.log(err);
+			res.send({
+				msg: failureMsg,
+				code: failure,
+				error: err,
+			});
+		} else if (user) {
+
+			res.send({
+				msg: successMsg,						
+				code: success,
+				userId: user._id,
+				isInSession: user.isInSession,
+				isAvailable: user.isAvailable,
+				userType: user.userType,
+			});	
+
 		} else {
 			res.send({
 				msg: failureMsg,
@@ -265,7 +303,7 @@ router.post(path("/checkCodeValid"), function(req, res) {
 			});
 		} else {
 			res.send({
-				msg: "SUCCESS",
+				msg: successMsg,
 				code: success,
 				isValid: !code.codeUsed,
 			});

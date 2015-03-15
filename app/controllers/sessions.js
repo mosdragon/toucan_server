@@ -131,7 +131,7 @@ router.post(path("/activeTutor"), function(req, res) {
 				if (err) {
 					console.log(err);
 					res.send({
-						msg: "FAILURE",
+						msg: failureMsg,
 						code: failure,
 					});
 				} else {
@@ -145,12 +145,12 @@ router.post(path("/activeTutor"), function(req, res) {
 								if (err) {
 									console.log(err);
 									res.send({
-										msg: "ERRORORR",
+										msg: failureMsg,
 										code: failure,
 									});
 								} else {
 									res.send({
-										msg: "SUCESSS",
+										msg: successMsg,
 										code: success,
 									});
 								}
@@ -160,12 +160,12 @@ router.post(path("/activeTutor"), function(req, res) {
 								if (err) {
 									console.log(err);
 									res.send({
-										msg: "ERRORORR",
+										msg: failureMsg,
 										code: failure,
 									});
 								} else {
 									res.send({
-										msg: "SUCESSS",
+										msg: successMsg,
 										code: success,
 										beginTime: beginTime,
 										endTime: endTime,
@@ -226,7 +226,7 @@ router.post(path("/inactiveTutor"), function(req, res) {
 							});
 						} else {
 							res.send({
-								msg: "SUCESSS",
+								msg: successMsg,
 								code: success,
 								beginTime: active.beginTime,
 								endTime: active.endTime,
@@ -295,8 +295,9 @@ router.post(path("/findActiveTutors"), function(req, res) {
     			+ "try again later or try closer to the University of Georgia(UGA) campus for better results.";
 
     		res.send({
-    			msg: message,
+    			msg: failureMsg,
     			code: success,
+    			details: message,
     			foundTutors: false,
     			tutors: [],
     		})	
@@ -355,14 +356,17 @@ router.post(path('/selectTutor'), function(req, res) {
 			console.log(err);
 			console.log("First error block");
 			res.send({
-				msg: "Something went wrong. Please try another tutor.",
+				msg: failureMsg,
 				code: failure,
+				details: "Something went wrong. Please try another tutor.",
 			});
 		} else if(active && !active.available) {
 			console.log("Tutor not available");
 			res.send({
-				msg: "It looks like this tutor is no longer available. Please try another tutor.",
+				msg: failureMsg,
 				code: failure,
+				details: "It looks like this tutor is no longer available. Please try another tutor.",
+
 			});
 		} else {
 			active.available = false;
@@ -382,13 +386,10 @@ router.post(path('/selectTutor'), function(req, res) {
 				if (err) {
 					console.log(err);
 					res.send({
-						msg: "Something went wrong. Please try another tutor.",
+						msg: failureMsg,
+						details: "Something went wrong. Please try another tutor.",
 						code: failure,
 						err: err,
-						extra: "Session save",
-						sessionId: session._id,
-						type: typeof(session._id),
-						session: session,
 					});				
 				} else {
 					active._session = session._id;
@@ -396,10 +397,10 @@ router.post(path('/selectTutor'), function(req, res) {
 						if (err) {
 							console.log(err);
 							res.send({
-								msg: "Something went wrong. Please try another tutor.",
+								msg: failureMsg,
 								code: failure,
+								details: "Something went wrong. Please try another tutor.",
 								err: err,
-								extra: "Active save",
 							});				
 						} else {
 							tutor.isAvailable = false;
@@ -409,10 +410,10 @@ router.post(path('/selectTutor'), function(req, res) {
 								if (err) {
 									console.log(err);
 									res.send({
-										msg: "Something went wrong. Please try another tutor.",
+										msg: failureMsg,
 										code: failure,
 										err: err,
-										extra: "Active save",
+										details: "Something went wrong. Please try another tutor.",
 									});	
 								} else {
 									var updates = {
@@ -427,10 +428,10 @@ router.post(path('/selectTutor'), function(req, res) {
 										if (err) {
 											console.log(err);
 											res.send({
-												msg: "Something went wrong. Please try another tutor.",
+												msg: failureMsg,
 												code: failure,
 												err: err,
-												extra: "Active save",
+												details: "Something went wrong. Please try another tutor.",
 											});		
 										} else {
 											res.send({
