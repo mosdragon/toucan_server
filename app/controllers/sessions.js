@@ -245,10 +245,11 @@ router.post(path("/inactiveTutor"), function(req, res) {
 router.post(path("/findActiveTutors"), function(req, res) {
 	var input = JSON.parse(req.body);
 
-	var hourLater = new Date();
-	hourLater.setHours(hourLater.getHours() + 1);
+	// Must have at least 30 mins of availability left
+	var later = new Date();
+	later.setMinutes(later.getMinutes() + 30);
 
-	var endTime = hourLater;
+	var endTime = later;
 	var latitude = input.latitude;
 	var longitude = input.longitude;
 	var course = input.course;
@@ -322,6 +323,9 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    		tutor.experience = data.experience;
 	    		tutor.reviews = data._reviews;
 	    		tutor.rating = data.rating;
+
+	    		tutor.longitude = availableTutor.location[0];
+	    		tutor.latitude = availableTutor.location[1];
 
 	    		tutors.push(tutor);
 	    	});

@@ -148,6 +148,7 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/users_
 	+ code
 	+ userId
 	+ isInSession
+	+ isAvailable
 	+ userType
 
 ###/login
@@ -161,6 +162,7 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/users_
 	+ code
 	+ userId
 	+ isInSession
+	+ isAvailable
 	+ userType
 
 
@@ -183,14 +185,14 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 ``` javascript
 	// Example
 	courseData = [
-		[
+		{
 		"coursename": "SPAN 1001",
 		"school": "University of Georgia(UGA)"
-		],
-		[
+		},
+		{
 		"coursename": "PSYC 2001",
 		"school": "University of Georgia(UGA)"
-		],
+		},
 	];
 ```
 
@@ -230,10 +232,8 @@ coursesTaught = ["PORT 2001", "SPAN 1001"];
 + ####params
 	+ latitude
 	+ longitude
-	+ userId
 	+ course
 	+ miles __\[OPTIONAL\] (Integer -> max distance to search by. Defaults to 3)__
-	+ endTime __(Long -> time in Milliseconds)__
 
 + ####response
 	+ msg
@@ -255,7 +255,9 @@ coursesTaught = ["PORT 2001", "SPAN 1001"];
 			"year": "",
 			"experience": 0,
 			"reviews": [ ],
-			"rating": 0
+			"rating": 0,
+			"latitude": 33.300933,
+			"longitude": -83.794122,
 		},
 		// More results
 	]

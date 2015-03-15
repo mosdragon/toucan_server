@@ -177,6 +177,7 @@ router.post(path('/signupTutor'), function(req, res) {
 										code: success,
 										userId: member._id,
 										isInSession: member.isInSession,
+										isAvailable: member.isAvailable,
 										userType: member.userType,
 									});
 								}

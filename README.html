@@ -288,6 +288,7 @@ courses/schools.</p>
 <li>code</li>
 <li>userId</li>
 <li>isInSession</li>
+<li>isAvailable</li>
 <li>userType</li>
 </ul>
 </li>
@@ -316,6 +317,7 @@ courses/schools.</p>
 <li>code</li>
 <li>userId</li>
 <li>isInSession</li>
+<li>isAvailable</li>
 <li>userType</li>
 </ul>
 </li>
@@ -355,14 +357,14 @@ courses/schools.</p>
 
 <div class="highlight highlight-javascript"><pre>    <span class="pl-c">// Example</span>
     courseData <span class="pl-k">=</span> [
-        [
+        {
         <span class="pl-s1"><span class="pl-pds">"</span>coursename<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>SPAN 1001<span class="pl-pds">"</span></span>,
         <span class="pl-s1"><span class="pl-pds">"</span>school<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>University of Georgia(UGA)<span class="pl-pds">"</span></span>
-        ],
-        [
+        },
+        {
         <span class="pl-s1"><span class="pl-pds">"</span>coursename<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>PSYC 2001<span class="pl-pds">"</span></span>,
         <span class="pl-s1"><span class="pl-pds">"</span>school<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>University of Georgia(UGA)<span class="pl-pds">"</span></span>
-        ],
+        },
     ];</pre></div>
 
 <h3>
@@ -441,11 +443,8 @@ coursesTaught <span class="pl-k">=</span> [<span class="pl-s1"><span class="pl-p
 <ul>
 <li>latitude</li>
 <li>longitude</li>
-<li>userId</li>
 <li>course</li>
 <li>miles <strong>[OPTIONAL] (Integer -&gt; max distance to search by. Defaults to 3)</strong>
-</li>
-<li>endTime <strong>(Long -&gt; time in Milliseconds)</strong>
 </li>
 </ul>
 </li>
@@ -477,7 +476,9 @@ coursesTaught <span class="pl-k">=</span> [<span class="pl-s1"><span class="pl-p
             <span class="pl-s1"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
             <span class="pl-s1"><span class="pl-pds">"</span>experience<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>,
             <span class="pl-s1"><span class="pl-pds">"</span>reviews<span class="pl-pds">"</span></span><span class="pl-k">:</span> [ ],
-            <span class="pl-s1"><span class="pl-pds">"</span>rating<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>
+            <span class="pl-s1"><span class="pl-pds">"</span>rating<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>latitude<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">33.300933</span>,
+            <span class="pl-s1"><span class="pl-pds">"</span>longitude<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-k">-</span><span class="pl-c1">83.794122</span>,
         },
         <span class="pl-c">// More results</span>
     ]</pre></div>
