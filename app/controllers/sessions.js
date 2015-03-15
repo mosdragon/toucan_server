@@ -277,8 +277,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    },
 	    available: true,
 	    endTime: {
-	    	$lt: params.endTime,
-	    	$gte: (new Date()),
+	    	$gte: params.endTime,
 	    }
 	})
 	.populate("_tutor")
@@ -288,6 +287,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	        res.send({
 	        	msg: failureMsg,
 	        	code: failure,
+	        	foundTutors: false,
 	        });
 	    } else if (!availableTutors || availableTutors.length === 0) {
 	    	console.log("No tutors found");
@@ -324,11 +324,8 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    		tutor.reviews = data._reviews;
 	    		tutor.rating = data.rating;
 
-	    		console.log(availableTutor);
-	    		console.log("LOCATION:    " + availableTutor.location);
-
-	    		// tutor.longitude = availableTutor.location[0];
-	    		// tutor.latitude = availableTutor.location[1];
+	    		tutor.longitude = availableTutor.location[0];
+	    		tutor.latitude = availableTutor.location[1];
 
 	    		tutors.push(tutor);
 	    	});
