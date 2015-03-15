@@ -324,8 +324,11 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    		tutor.reviews = data._reviews;
 	    		tutor.rating = data.rating;
 
-	    		tutor.longitude = availableTutor.location[0];
-	    		tutor.latitude = availableTutor.location[1];
+	    		console.log(availableTutor);
+	    		console.log("LOCATION:    " + availableTutor.location);
+
+	    		// tutor.longitude = availableTutor.location[0];
+	    		// tutor.latitude = availableTutor.location[1];
 
 	    		tutors.push(tutor);
 	    	});
