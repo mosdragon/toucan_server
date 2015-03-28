@@ -31,6 +31,7 @@ router.post(path('/signupStudent'), function(req, res) {
 	var username = input.username;
 	var password = input.password;
 	var emailAddress = input.emailAddress;
+	var school = input.school ? input.school : "University of Georgia";
 	// This will be null at time -> defaults to "TUTEE"
 	var userType = "TUTEE";
 
@@ -42,6 +43,7 @@ router.post(path('/signupStudent'), function(req, res) {
 		'password': password,
 		'emailAddress': emailAddress,
 		'userType': userType,
+		'school': school,
 	};
 
 	// Card Parameters
@@ -98,6 +100,10 @@ router.post(path('/signupTutor'), function(req, res) {
 	var emailAddress = input.emailAddress;
 	var tutorCode = input.tutorCode;
 
+	var biography = input.biography ? input.biography : "";
+	var major = input.major ? input.major : "";
+	var school = input.school ? input.school : "";
+
 	// Taking credit card AND bank info from a user makes them "BOTH" a 
 	// tutor and a tutee
 	var userType = "BOTH";
@@ -110,6 +116,9 @@ router.post(path('/signupTutor'), function(req, res) {
 		'password': password,
 		'emailAddress': emailAddress,
 		'userType': userType,
+		'biography': biography,
+		'major': major,
+		'school': school,
 	};
 
 	// Card Parameters

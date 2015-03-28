@@ -48,6 +48,7 @@ var userSchema = new mongoose.Schema({
 	// Number of sessions done
 	experience: {type: Number, default: 0},
 	isAvailable: {type: Boolean, default: false},
+	school: {type: String, required: true},
 });
 
 userSchema.plugin(autoIncrement.plugin, {

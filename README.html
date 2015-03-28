@@ -74,7 +74,7 @@ during login/signup)</strong>
 </li>
 <li>course <strong>(String)</strong>
 </li>
-<li>school <strong>(String)</strong>
+<li>school <strong>(String). Note: This must be the exact same spelling for the same school, every time.</strong>
 </li>
 <li>userType <strong>("TUTEE", "TUTOR", or "BOTH")</strong>
 </li>
@@ -249,6 +249,7 @@ courses/schools.</p>
 </li>
 <li>phoneNumber <strong>(String)</strong>
 </li>
+<li>school</li>
 <li>cardNumer <strong>(String -- only the last 4 digits)</strong>
 </li>
 <li>card_token</li>
@@ -386,11 +387,11 @@ courses/schools.</p>
     courseData <span class="pl-k">=</span> [
         {
         <span class="pl-s"><span class="pl-pds">"</span>coursename<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>SPAN 1001<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>school<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>University of Georgia(UGA)<span class="pl-pds">"</span></span>
+        <span class="pl-s"><span class="pl-pds">"</span>school<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>University of Georgia<span class="pl-pds">"</span></span>
         },
         {
         <span class="pl-s"><span class="pl-pds">"</span>coursename<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>PSYC 2001<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>school<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>University of Georgia(UGA)<span class="pl-pds">"</span></span>
+        <span class="pl-s"><span class="pl-pds">"</span>school<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>University of Georgia<span class="pl-pds">"</span></span>
         },
     ];</pre></div>
 
@@ -471,6 +472,7 @@ coursesTaught <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pd
 <li>latitude</li>
 <li>longitude</li>
 <li>course</li>
+<li>school</li>
 <li>miles <strong>[OPTIONAL] (Integer -&gt; max distance to search by. Defaults to 3)</strong>
 </li>
 </ul>
@@ -676,7 +678,12 @@ on the client-side.</p>
 <li>msg</li>
 <li>code</li>
 <li>hasReviews (Boolean)</li>
-<li>reviews</li>
+<li>reviews
+
+<ul>
+<li>course</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

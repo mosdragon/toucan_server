@@ -18,6 +18,7 @@ var activeSchema = new mongoose.Schema({
 	endTime: {type: Date, required: true},
 	available: {type: Boolean, default: true},
 	coursesTaught: {type: [String], default: []},
+	school: {type: String},
 	// Using geospatial indexing -- format is [long, lat]
 	location: { type: [Number], index: '2dsphere', required: true},
 });

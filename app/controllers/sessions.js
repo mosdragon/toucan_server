@@ -36,8 +36,6 @@ router.post(path("/getCourses"), function(req, res) {
 	// Preset dist from student to campus
 	miles = courseRadius;
 
-	console.log("Miles away " + miles);
-
 	var location = [longitude, latitude];
 
 	var params = {
@@ -137,6 +135,7 @@ router.post(path("/activeTutor"), function(req, res) {
 				} else {
 					params._tutor = user._id;
 					params.coursesTaught = user.coursesTaught;
+					params.school = user.school;
 					Active.findOne({_tutor: user._id}, function(err, active) {
 						if (err || !active) {
 							// No active exists for this person. Create a new one.
@@ -254,6 +253,7 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	var longitude = input.longitude;
 	var course = input.course;
 	var miles = input.miles ? parseInt(input.miles) : 3;
+	var school = input.school;
 
 
 	var params = {
@@ -278,7 +278,8 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    available: true,
 	    endTime: {
 	    	$gte: params.endTime,
-	    }
+	    },
+	    "school": school,
 	})
 	.populate("_tutor")
 	.exec(function(err, availableTutors) {
@@ -711,6 +712,7 @@ router.post(path('/getReviews'), function(req, res) {
 				formatted.rating = review.rating;
 				// This will be a time in long milliseconds
 				formatted.date = review.dateWritten.getTime();
+				formatted.course = course;
 
 				formattedReviews.push(formatted);
 			});

@@ -19,7 +19,7 @@ response variables:
 + latitude __(Double)__
 + longitude __(Double)__
 + course __(String)__
-+ school __(String)__
++ school __(String). Note: This must be the exact same spelling for the same school, every time.__
 + userType __("TUTEE", "TUTOR", or "BOTH")__
 
 __Assume everything asked for as a param is a string unless otherwise stated__
@@ -117,6 +117,7 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/users_
 	+ emailAddress
 	+ password __(String)__
 	+ phoneNumber __(String)__
+	+ school
 	+ cardNumer __(String -- only the last 4 digits)__
 	+ card_token
 	``` javascript
@@ -198,11 +199,11 @@ __All endpoints here must look like this:__ _&lt;baseurl&gt;+/sessions/_
 	courseData = [
 		{
 		"coursename": "SPAN 1001",
-		"school": "University of Georgia(UGA)"
+		"school": "University of Georgia"
 		},
 		{
 		"coursename": "PSYC 2001",
-		"school": "University of Georgia(UGA)"
+		"school": "University of Georgia"
 		},
 	];
 ```
@@ -244,6 +245,7 @@ coursesTaught = ["PORT 2001", "SPAN 1001"];
 	+ latitude
 	+ longitude
 	+ course
+	+ school
 	+ miles __\[OPTIONAL\] (Integer -> max distance to search by. Defaults to 3)__
 
 + ####response
@@ -348,6 +350,7 @@ on the client-side.
   + code
   + hasReviews (Boolean)
   + reviews
+	+ course
 ``` javascript
 	// Example
 	reviews = [
