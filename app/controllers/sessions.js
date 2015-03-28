@@ -322,7 +322,6 @@ router.post(path("/findActiveTutors"), function(req, res) {
 	    		tutor.year = data.year;
 
 	    		tutor.experience = data.experience;
-	    		tutor.reviews = data._reviews;
 	    		tutor.rating = data.rating;
 
 	    		tutor.longitude = availableTutor.location[0];
@@ -670,6 +669,57 @@ router.post(path('/review'), function(req, res) {
 						}
 					});
 				}
+			});
+		}
+	});
+});
+
+router.post(path('/getReviews'), function(req, res) {
+	var input = JSON.parse(req.body);
+
+	var tutorId = input.tutorId;
+	var course = input.course;
+
+	Review.find({
+		"_tutor": tutorId,
+
+	})
+	.exec(function(err, reviews) {
+		if (err || !reviews) {
+			console.log(err);
+			res.send({
+				msg: failureMsg,
+				code: failure,
+				err: err,
+			});
+		} else if (reviews.length === 0) {
+			res.send({
+				msg: successMsg,
+				code: success,
+				hasReviews: false,
+				details: "No reviews available for this tutor.",
+				reviews: [],
+			})
+		} else {
+			var formattedReviews = [];
+
+			reviews.forEach(function(review) {
+				var formatted = {};
+				formatted.studentUsername = review.studentUsername;
+				formatted.title = review.title;
+				formatted.details = review.details;
+				formatted.rating = review.rating;
+				// This will be a time in long milliseconds
+				formatted.date = review.dateWritten.getTime();
+
+				formattedReviews.push(formatted);
+			});
+			res.send({
+				msg: successMsg,
+				code: success,
+				hasReviews: true,
+				reviews: formattedReviews,
+				details: "Reviews found",
 			});
 		}
 	});

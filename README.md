@@ -265,7 +265,6 @@ coursesTaught = ["PORT 2001", "SPAN 1001"];
 			"major": "",
 			"year": "",
 			"experience": 0,
-			"reviews": [ ],
 			"rating": 0,
 			"latitude": 33.300933,
 			"longitude": -83.794122,
@@ -334,7 +333,31 @@ on the client-side.
 	+ title __\[OPTIONAL\] (String - just the title of the review)__
 	+ details __\[OPTIONAL\] (String - the actual review)__
 
-
 + ####response
 	+ msg
 	+ code
+
+
+###/getReviews
++ ####params
+	+ tutorId
+  + course
+
++ ####response
+	+ msg
+  + code
+  + hasReviews (Boolean)
+  + reviews
+``` javascript
+	// Example
+	reviews = [
+		{
+			"studentUsername": "mosdragon",
+			"title": "Amazing with Derivatives!",
+			"details": "He even had old tests to help me out! Plus, he was right on time.",
+			"rating": 4.5,
+			"date": 213124032434903 // This will be a time in milliseconds [Long]
+		},
+		// More results
+	]
+```

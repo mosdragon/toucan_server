@@ -7,8 +7,8 @@ autoIncrement.initialize(mongoose);
 var bankAccountSchema = new mongoose.Schema({
 	_user: {type: Number, ref: "Users"},
 	_transfers: {type: [Number], ref: "Transfers", default: []},
-	stripe_id: {type: String, unique: true},
-	stripe_token: {type: Object, required: true, unique: true},
+	stripe_id: {type: String},
+	stripe_token: {type: Object, required: true},
 	nickname: {type: String},
 	userEmail: String,
     legal_name: String,

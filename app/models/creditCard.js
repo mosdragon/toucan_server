@@ -10,8 +10,8 @@ var creditCardSchema = new mongoose.Schema({
 	_charges: {type: [Number], ref: "Charges"},
 	userEmail: String,
     cardNumber: {type: String, default: "XXXX-XXXX-XXXX-"},
-    stripe_id: {type: String, unique: true},
-    stripe_token: {type: Object, unique: true},
+    stripe_id: {type: String},
+    stripe_token: {type: Object},
 });
 
 creditCardSchema.plugin(autoIncrement.plugin, {

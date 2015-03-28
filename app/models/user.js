@@ -44,7 +44,7 @@ var userSchema = new mongoose.Schema({
 	major: {type: String, default: ""},
 	year: {type: String, default: ""},
 	// Starts at -1. Then, averages ratings of 1 - 5
-	rating: {type: Number, default: 0},
+	rating: {type: Number, default: -1},
 	// Number of sessions done
 	experience: {type: Number, default: 0},
 	isAvailable: {type: Boolean, default: false},
