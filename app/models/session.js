@@ -29,23 +29,23 @@ var minuteLater = function(input) {
 	return input;
 };
 
-var stripe_api_key = require("../../config").dev.stripe_api_key;
+var config = require("../../config");
+
+var stripe_api_key = config.dev.stripe_api_key;
 var stripe = require("stripe")(stripe_api_key);
 
-var toucan_bank_id = require("../../config").dev.toucan_bank_id;
-var toucan_transfer_id = require("../../config").dev.toucan_transfer_id;
+var toucan_bank_id = config.dev.toucan_bank_id;
+var toucan_transfer_id = config.dev.toucan_transfer_id;
 
-var defaultHours = require("../../config").dev.defaultHours;
-var baseTime = require("../../config").dev.baseTime;
+var defaultHours = config.dev.defaultHours;
+var baseTime = config.dev.baseTime;
+// Max length of time any tutoring session can last --> A safety net to prevent ridiculous charges
+var maxHours = config.dev.maxHours;
 
 // How much Toucan keeps vs what percentage a tutor gets
 var percentTutor = require("../../config").dev.percentTutor / 100;
-var percentStripe = require("../../config").dev.percentStripe / 100;
-var percentToucan = Math.floor((1 - (percentTutor + percentStripe))* 100) / 100;
 
 console.log("percentTutor: " + percentTutor);
-console.log("percentStripe: " + percentStripe);
-console.log("percentToucan: " + percentToucan);
 
 var User = require("../models/user");
 var CreditCard = require("../models/creditCard");
@@ -161,8 +161,13 @@ var calculateCosts = function(session, callback) {
 	}
 
 	totalHours += fullHours;
-	if (totalHours >=  baseTime && totalHours < 0.75) {
+	// Ensures min number of hours reached
+	if (totalHours >=  baseTime && totalHours < defaultHours) {
 		totalHours = defaultHours;
+	}
+
+	if (totalHours > maxHours) {
+		totalHours = maxHours;
 	}
 	console.log("Total Hours: " + totalHours);
 
@@ -186,17 +191,16 @@ sessionSchema.methods.endAppointment = function(callback) {
 
 			var updateJob = schedule.scheduleJob(immediately, 
 				updateIsInSession.bind(null, self, function(err) {
-					console.log("updateIsInSession complete");
 					if (err) {
 						console.log(err);
 					}
 				})
 			);
 
+			// Begin charging student's credit card after one minute
 			var date = minuteLater(new Date());
 			var chargeStudentJob = schedule.scheduleJob(date,
 				chargeStudent.bind(null, self, function(err) {
-					console.log("ChargeStudent complete");
 					if (err) {
 						console.log(err);
 					}
@@ -238,7 +242,6 @@ var chargeStudent = function(session, callback) {
 				console.log(err);
 				callback(err);
 			} else {
-				console.log("CARD FOUND");
 				var customerId = card.stripe_id;
 				var studentEmail = card.userEmail;
 				// Send an email to student if charge successful. Use temp email.
@@ -255,6 +258,7 @@ var chargeStudent = function(session, callback) {
 					" hour(s) at a rate of $" +  self.hourlyRate + "/hour on " + dateString
 					+ ". Total Cost: $" + dollars + "." + cents + ".";
 
+				console.log("CHARGE STUDENT:");
 				console.log(description);
 
 
@@ -341,7 +345,6 @@ var payTutor = function(session, callback) {
 			console.log(err);
 			return callback(err);
 		} else {
-			console.log("Found Bank Account");
 			// Create a transfer to the specified recipient
 			var recipientId = account.stripe_id;
 			var pennies = Math.floor(amount * 100 * percentTutor);
@@ -355,6 +358,7 @@ var payTutor = function(session, callback) {
 			var description = "Payment by Toucan Tutoring for teaching " + self.course +
 				" on "  + dateString + ". Compsensation of $" + dollars + "." + cents + ".";
 
+			console.log("PAY TUTOR");
 			console.log(description);
 
 			var bank_account_id = account.stripe_token.active_account.id;
@@ -407,7 +411,24 @@ var payToucan = function(session, callback) {
 	var amountDollars = Math.floor(amount);
 	var amountCents = Math.floor(amount * 100) % 100;
 
-	var pennies = Math.floor(amount * 100 * percentToucan);
+	// All payment processing will be done in cents
+
+	var amountInCents = Math.floor(amount * 100);
+
+	var paymentTutor = Math.floor(amountInCents * percentTutor);
+	var stripeFee = function(amount) {
+		var transactionFee = 2.9/100; // 2.9%
+		var creditCardCost = 30; // $0.30
+		var transferCost = 2 * 25; // $0.25, done twice --> once to transfer money to tutor
+		// another to transfer to Toucan
+		var fee = (amountInCents * transactionFee) + creditCardCost + transferCost;
+		return Math.ceil(fee);
+	}
+	var paymentFees = stripeFee(amountInCents);
+
+	var leftOver = Math.floor(amountInCents - (paymentTutor + paymentFees));
+
+	var pennies = leftOver;
 	var dollars = Math.floor(pennies / 100);
 	var cents = Math.floor(pennies % 100);
 
@@ -419,6 +440,7 @@ var payToucan = function(session, callback) {
 		+ dateString + ". Session Cost: $" + amountDollars + "." + amountCents
 		+ ". Self-payment: $" + dollars + "." + cents;
 
+	console.log("PAY TOUCAN");
 	console.log(description);
 	
 	var bank_account_id = toucan_bank_id;

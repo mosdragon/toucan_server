@@ -360,6 +360,7 @@ on the client-side.
 			"details": "He even had old tests to help me out! Plus, he was right on time.",
 			"rating": 4.5,
 			"date": 213124032434903 // This will be a time in milliseconds [Long]
+			"course": "PORT 2001"
 		},
 		// More results
 	]
